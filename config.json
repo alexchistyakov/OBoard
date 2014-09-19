@@ -1,0 +1,25 @@
+{
+	"general": {
+        "company":"OBoard",
+        "logo":"OBoard",
+		"port": 80,
+        "delimeter": {
+            "web": " | ",
+            "email": " - "
+        },
+        "description":[
+            "Onboarding done right"
+        ],
+        "production": false
+	},
+	"database": {
+        "reset": false,
+        "sync": true,
+        "debug": false,
+        "protocol": "mysql:",
+        "host": "127.0.0.1",
+        "database": "oboard",
+        "user": "oboard",
+        "password": "oboard78"
+    }
+}

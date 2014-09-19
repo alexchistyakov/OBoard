@@ -1,0 +1,37 @@
+orm = require "orm"
+config = require "../config"
+async = require "async"
+init = false
+dbModels = null
+module.exports.express = orm.express config.database, 
+	define: (db,models,callback) ->
+		dbModels = models
+		models.tutorials = require("./tutorials")(db,models)
+		models.boxes = require("./tutorials/boxes")(db,models)
+		models.users = require("./users")(db,models)
+
+		models.boxes.hasOne "tutorial",models.tutorials, 
+			reverse : "boxes"
+
+		models.tutorials.hasOne "owner",models.users,
+			reverse : "tutorials"
+			
+		unless init
+			async.series [
+				(next) =>
+					if config.database.reset
+						db.drop next
+					else
+						next()
+				(next) =>
+					if config.database.reset or config.database.sync
+						db.sync next
+					else
+						next()
+			], (errors) =>
+				init = true
+				callback() if callback?
+		else
+			callback() if callback?
+module.exports.model = (name) ->
+	dbModels[name]

@@ -1,0 +1,9 @@
+<% include ./includes/start.html %>
+	<% if(isAuthenticated) { %>
+		Hello, <%- user.username -%>!
+	<% } else {
+		console.log(user)%> 
+		<a href="/login">Click here to login</a><br>
+		<a href="/register">Don't have an account? Click here to register!</a>
+	<% } %>
+<% include ./includes/end.html %>

@@ -1,0 +1,28 @@
+.oboard_box {
+	position: relative;
+	background: #fff;
+	border: 2px solid #fff;
+}
+.oboard_box:after, .oboard_box:before {
+	right: 100%;
+	left: 50%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+
+.oboard_box:after {
+	border-color: rgba(255, 255, 255, 0);
+	border-bottom-color: #fff;
+	border-width: 10px;
+	margin-left: -10px;
+}
+.oboard_box:before {
+	border-color: rgba(196, 245, 199, 0);
+	border-bottom-color: #fff;
+	border-width: 13px;
+	margin-left: -13px;
+}
