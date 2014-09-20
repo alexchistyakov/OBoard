@@ -9,19 +9,21 @@ window.OBoard = {
 		full_url = @oboardUrl
 		full_params = ""
 
-		params.project = @element.getAttribute "data-key" 
+		params.userSecret = @element.getAttribute "data-key"
+		console.log params.userSecret 
 		params.host = window.location.hostname
 		params.path = window.location.pathname
 		params.port = window.location.port
 
-		for key in params
+		console.log params
+
+		for key,value of params
 			unless full_params is ""
 				full_params += "&"
+			if value?
+				full_params += "#{key}=#{encodeURIComponent value}"
 
-			if params[key]?
-				full_params += "#{key}=#{encodeURIComponent params[key]}"
-
-		if action is "GET" 
+		if action is "GET"
 			full_url += "?" + full_params
 
 		if XMLHttpRequest?
@@ -63,24 +65,24 @@ window.OBoard = {
 	loadTutorial: (pub_id,callback) ->
 		params =
 			command: "load-tutorial"
-			tutorialId: pub_id
+			tutorial_id: pub_id
 			frombox: @element.getAttribute "frombox"
 			tobox: @element.getAttribute "tobox"
-		console.log params
 		@oboardRequest params, "GET", (response) ->
-			@currentTutorial = response.data
-			@currentBoxId = -1
-			response.data.assets.css.forEach (href) ->
-				link = document.createElement "link"
-				link.href = href
-				link.rel = "stylesheet"
-				document.head.appendChild link
-			response.data.assets.js.forEach (src) ->
-				link = document.createElement "script"
-				script.src = src;
-				script.type = "text/javascript"
-				document.head.appendChild script
-			callback()
+			unless response is false
+				@currentTutorial = response.data
+				@currentBoxId = -1
+				response.data.assets.css.forEach (href) ->
+					link = document.createElement "link"
+					link.href = href
+					link.rel = "stylesheet"
+					document.head.appendChild link
+				response.data.assets.js.forEach (src) ->
+					script = document.createElement "script"
+					script.src = src;
+					script.type = "text/javascript"
+					document.head.appendChild script
+				callback()
 	# TODO
 	unloadTutorial: ->
 		currentTutorial = null

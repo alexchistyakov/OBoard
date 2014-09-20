@@ -6,21 +6,23 @@
     element: document.getElementById("oboard-js"),
     oboardUrl: "http://localhost/api",
     oboardRequest: function(params, action, callback) {
-      var e, full_params, full_url, i, key, versions, xhr, _i, _j, _len, _ref;
+      var e, full_params, full_url, i, key, value, versions, xhr, _i, _ref;
       xhr = null;
       full_url = this.oboardUrl;
       full_params = "";
-      params.project = this.element.getAttribute("data-key");
+      params.userSecret = this.element.getAttribute("data-key");
+      console.log(params.userSecret);
       params.host = window.location.hostname;
       params.path = window.location.pathname;
       params.port = window.location.port;
-      for (_i = 0, _len = params.length; _i < _len; _i++) {
-        key = params[_i];
+      console.log(params);
+      for (key in params) {
+        value = params[key];
         if (full_params !== "") {
           full_params += "&";
         }
-        if (params[key] != null) {
-          full_params += key + "=" + encodeURIComponent(params[key]);
+        if (value != null) {
+          full_params += "" + key + "=" + (encodeURIComponent(value));
         }
       }
       if (action === "GET") {
@@ -30,7 +32,7 @@
         xhr = new XMLHttpRequest();
       } else {
         versions = ["MSXML2.XmlHttp.5.0", "MSXML2.XmlHttp.4.0", "MSXML2.XmlHttp.3.0", "MSXML2.XmlHttp.2.0", "Microsoft.XmlHttp"];
-        for (i = _j = 0, _ref = versions.length; 0 <= _ref ? _j <= _ref : _j >= _ref; i = 0 <= _ref ? ++_j : --_j) {
+        for (i = _i = 0, _ref = versions.length; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
           try {
             xhr = new ActiveXObject(versions[i]);
             break;
@@ -58,29 +60,33 @@
       return xhr.send(full_params);
     },
     loadTutorial: function(pub_id, callback) {
-      return this.oboardRequest({
+      var params;
+      params = {
         command: "load-tutorial",
-        tutorialId: pub_id,
+        tutorial_id: pub_id,
         frombox: this.element.getAttribute("frombox"),
         tobox: this.element.getAttribute("tobox")
-      }, "GET", function(response) {
-        this.currentTutorial = response.data;
-        this.currentBoxId = -1;
-        response.data.assets.css.forEach(function(href) {
-          var link;
-          link = document.createElement("link");
-          link.href = href;
-          link.rel = "stylesheet";
-          return document.head.appendChild(link);
-        });
-        response.data.assets.js.forEach(function(src) {
-          var link;
-          link = document.createElement("script");
-          script.src = src;
-          script.type = "text/javascript";
-          return document.head.appendChild(script);
-        });
-        return callback();
+      };
+      return this.oboardRequest(params, "GET", function(response) {
+        if (response !== false) {
+          this.currentTutorial = response.data;
+          this.currentBoxId = -1;
+          response.data.assets.css.forEach(function(href) {
+            var link;
+            link = document.createElement("link");
+            link.href = href;
+            link.rel = "stylesheet";
+            return document.head.appendChild(link);
+          });
+          response.data.assets.js.forEach(function(src) {
+            var script;
+            script = document.createElement("script");
+            script.src = src;
+            script.type = "text/javascript";
+            return document.head.appendChild(script);
+          });
+          return callback();
+        }
       });
     },
     unloadTutorial: function() {
