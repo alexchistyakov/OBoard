@@ -1,0 +1,20 @@
+.oboard-menubutton{
+	background-image: url("/img/menubutton.png");
+	width: 40px;
+	height: 40px;
+	position: absolute;
+	right:0;
+	bottom:0;
+	margin-right: 20px;
+}
+
+@-webkit-keyframes buttonhide {
+    from {bottom:0;}
+    to {bottom:-20px;}
+}
+
+/* Standard syntax */
+@keyframes buttonhide {
+    from {bottom:0;}
+    to {bottom:-20px;}
+}

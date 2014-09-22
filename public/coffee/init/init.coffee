@@ -75,7 +75,8 @@
 				script.type = "text/javascript"
 				document.head.appendChild script
 			interval = setInterval ->
-				if window.OBoard?
+				if window.OBoard? and $?
+					$("body").append response.data.content
 					clearInterval interval	
 					window.OBoard.init oboardRequest,element,oboardUrl
 			, 10

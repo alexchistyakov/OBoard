@@ -79,7 +79,8 @@
           return document.head.appendChild(script);
         });
         return interval = setInterval(function() {
-          if (window.OBoard != null) {
+          if ((window.OBoard != null) && (typeof $ !== "undefined" && $ !== null)) {
+            $("body").append(response.data.content);
             clearInterval(interval);
             return window.OBoard.init(oboardRequest, element, oboardUrl);
           }

@@ -23,11 +23,15 @@ module.exports =
 							href
 						else
 							req.protocol+"://"+req.hostname + href
+				resHtml = null
+				req.app.render "oboardclient/menu", {}, (error,content) ->
+					resHtml = content
 				callback true,
 					tutorials: resTutorials
 					assets:
 						js: resJs
 						css: resCss
+					content: resHtml
 				
 
 		"load-tutorial": (req,user,callback)->
