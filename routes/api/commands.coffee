@@ -9,14 +9,14 @@ module.exports =
 					resTutorials.push
 						name: tutorial.name
 						tutorial_id: tutorial.pub_id
-				resJs = $.map req.coffee.renderTags("tutorial").split("\n"), (script) ->
+				resJs = $.map req.coffee.renderTags("oboard").split("\n"), (script) ->
 					if script? and not not $(script).attr("src")
 						src = $(script).attr "src"
 						if src.startsWith "http"
 							src
 						else
 							req.protocol+"://"+req.hostname + src
-				resCss = css: $.map req.css.renderTags("tutorial").split("\n"), (stylesheet) ->
+				resCss = $.map req.css.renderTags("oboardclient").split("\n"), (stylesheet) ->
 					if stylesheet? and not not $(stylesheet).attr("href")
 						href = $(stylesheet).attr "href"
 						if href.startsWith "http"
