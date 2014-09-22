@@ -2,10 +2,19 @@ commands = require "./commands"
 module.exports.expressGet = (req,res,next) ->
 	command = commands.get[req.param "command"]
 	if command?
-		command req, (success,data) ->
-			res.json
-				success: success
-				data: data
+		# Run user verification
+		req.models.users.one
+			pub_id: req.param "userSecret"
+		, (err,user) ->
+			unless user?
+				res.json
+					success: false
+					message: "Invalid user secret"
+			else
+				command req,user, (success,data) ->
+					res.json
+						success: success
+						data: data
 	else
 		res.json 
 			success: false
