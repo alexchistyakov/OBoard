@@ -1,5 +1,7 @@
 module.exports = 
 	get:
+		"load-essentials": (req,callback)->
+			
 		"load-tutorial": (req,callback)->
 			tutorial_id = req.param("tutorial_id")
 			unless tutorial_id?

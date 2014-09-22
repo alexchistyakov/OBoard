@@ -62,12 +62,12 @@ window.OBoard = {
 
 		xhr.send(full_params);
 
-	loadTutorial: (pub_id,callback) ->
+	loadTutorial: (pub_id,frombox,tobox,callback) ->
 		params =
 			command: "load-tutorial"
 			tutorial_id: pub_id
-			frombox: @element.getAttribute "frombox"
-			tobox: @element.getAttribute "tobox"
+			frombox: frombox
+			tobox: tobox
 		@oboardRequest params, "GET", (response) ->
 			unless response is false
 				@currentTutorial = response.data

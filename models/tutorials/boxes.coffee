@@ -5,5 +5,8 @@ module.exports = (db,models) ->
 		text : String
 		bound_id : String
 		popup: Boolean
+		next_button: Boolean
+		arrow_side: 
+			type: "integer"
 	,
 		timestamp: true

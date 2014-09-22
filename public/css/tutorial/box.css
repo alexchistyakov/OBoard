@@ -1,9 +1,9 @@
-.oboard_box {
+.oboard-box {
 	position: relative;
 	background: #fff;
 	border: 2px solid #fff;
 }
-.oboard_box:after, .oboard_box:before {
+.oboard-box:after, .oboard_box:before {
 	right: 100%;
 	left: 50%;
 	border: solid transparent;
@@ -14,15 +14,27 @@
 	pointer-events: none;
 }
 
-.oboard_box:after {
+.oboard-box:after {
 	border-color: rgba(255, 255, 255, 0);
 	border-bottom-color: #fff;
 	border-width: 10px;
 	margin-left: -10px;
 }
-.oboard_box:before {
+.oboard-box:before {
 	border-color: rgba(196, 245, 199, 0);
 	border-bottom-color: #fff;
 	border-width: 13px;
 	margin-left: -13px;
+}
+.oboard-box .oboard-close-button {
+	background: url("/img/closebutton.png");
+	width: auto;
+	height: auto;
+}
+.oboard-box .oboard-next-button {
+	width: 200px;
+	height: 100px;
+	background-color: #8b8;
+	border: solid transparent;
+	border-radius: 7px;
 }
