@@ -6,15 +6,9 @@
 	right:0;
 	bottom:0;
 	margin-right: 20px;
+	-webkit-transition: bottom .5s;
+	transition: bottom .5s;
 }
-
-@-webkit-keyframes buttonhide {
-    from {bottom:0;}
-    to {bottom:-20px;}
-}
-
-/* Standard syntax */
-@keyframes buttonhide {
-    from {bottom:0;}
-    to {bottom:-20px;}
+.oboard-menubutton-hidden{
+	bottom: -40px;
 }

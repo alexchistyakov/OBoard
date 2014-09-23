@@ -1,4 +1,4 @@
-window.OBoard = {
+window.OBoard =
 	currentTutorial: null
 	currentBoxId: null
 
@@ -9,6 +9,7 @@ window.OBoard = {
 		@oboardRequest = request
 		@element = element
 		@oboardUrl = url
+		@ui.initalize()
 		@initialized = true
 
 	loadTutorial: (pub_id,frombox,tobox,callback) ->
@@ -35,4 +36,14 @@ window.OBoard = {
 	throwErrUnlessInit: ->
 		unless initialized
 			throw new Error "OBoard not initialized"
-}
+
+	ui:
+		menuButton: "#oboard-menubutton"
+		initalize: ->
+			$(@menuButton).click ->
+				console.log "CLICK"
+				window.OBoard.ui.hideMenuButton()
+		hideMenuButton: ->
+			$(@menuButton).addClass "oboard-menubutton-hidden"
+		showMenuButton: ->
+			$(@menuButton).removeClass "oboard-menubutton-hidden"
