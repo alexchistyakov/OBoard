@@ -39,11 +39,19 @@ window.OBoard =
 
 	ui:
 		menuButton: "#oboard-menubutton"
+		menu: "#oboard-menu"
 		initalize: ->
 			$(@menuButton).click ->
-				console.log "CLICK"
 				window.OBoard.ui.hideMenuButton()
+				window.OBoard.ui.showMenu()
+			$("#oboard-menu-close").click ->
+				window.OBoard.ui.showMenuButton()
+				window.OBoard.ui.hideMenu()
 		hideMenuButton: ->
 			$(@menuButton).addClass "oboard-menubutton-hidden"
 		showMenuButton: ->
 			$(@menuButton).removeClass "oboard-menubutton-hidden"
+		showMenu: ->
+			$(@menu).removeClass "oboard-menu-hidden"
+		hideMenu: ->
+			$(@menu).addClass "oboard-menu-hidden"

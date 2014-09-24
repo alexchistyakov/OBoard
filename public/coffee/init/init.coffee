@@ -7,7 +7,6 @@
 		full_params = ""
 
 		params.userSecret = element.getAttribute "data-key"
-		console.log params.userSecret 
 		params.host = window.location.hostname
 		params.path = window.location.pathname
 		params.port = window.location.port
