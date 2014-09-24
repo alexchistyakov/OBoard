@@ -62,7 +62,6 @@
 		command: "load-essentials"
 	, "GET", (response) ->
 		unless response is false
-			console.log "HERE"
 			response.data.assets.css.forEach (href) ->
 				link = document.createElement "link"
 				link.href = href
@@ -77,6 +76,6 @@
 				if window.OBoard? and $?
 					$("body").append response.data.content
 					clearInterval interval	
-					window.OBoard.init oboardRequest,element,oboardUrl
+					window.OBoard.init response.data.oboard,oboardRequest,element,oboardUrl
 			, 10
 )(window,document)

@@ -10,7 +10,6 @@
       full_url = oboardUrl;
       full_params = "";
       params.userSecret = element.getAttribute("data-key");
-      console.log(params.userSecret);
       params.host = window.location.hostname;
       params.path = window.location.pathname;
       params.port = window.location.port;
@@ -63,7 +62,6 @@
     }, "GET", function(response) {
       var interval;
       if (response !== false) {
-        console.log("HERE");
         response.data.assets.css.forEach(function(href) {
           var link;
           link = document.createElement("link");
@@ -82,7 +80,7 @@
           if ((window.OBoard != null) && (typeof $ !== "undefined" && $ !== null)) {
             $("body").append(response.data.content);
             clearInterval(interval);
-            return window.OBoard.init(oboardRequest, element, oboardUrl);
+            return window.OBoard.init(response.data.oboard, oboardRequest, element, oboardUrl);
           }
         }, 10);
       }

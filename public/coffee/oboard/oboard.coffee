@@ -3,13 +3,14 @@ window.OBoard =
 	currentBoxId: null
 
 	oboardRequest: null
-
+	tutorials: []
 	initialized: false
-	init: (request,element,url) ->
+	init: (data,request,element,url) ->
 		@oboardRequest = request
 		@element = element
 		@oboardUrl = url
-		@ui.initalize()
+		@tutorials = data.tutorials
+		@ui.initalize @tutorials
 		@initialized = true
 
 	loadTutorial: (pub_id,frombox,tobox,callback) ->
@@ -40,13 +41,14 @@ window.OBoard =
 	ui:
 		menuButton: "#oboard-menubutton"
 		menu: "#oboard-menu"
-		initalize: ->
+		initalize: (tutorialNames)->
 			$(@menuButton).click ->
 				window.OBoard.ui.hideMenuButton()
 				window.OBoard.ui.showMenu()
 			$("#oboard-menu-close").click ->
 				window.OBoard.ui.showMenuButton()
 				window.OBoard.ui.hideMenu()
+			@addTutorialName tutorial.name for tutorial in tutorialNames
 		hideMenuButton: ->
 			$(@menuButton).addClass "oboard-menubutton-hidden"
 		showMenuButton: ->
@@ -55,3 +57,8 @@ window.OBoard =
 			$(@menu).removeClass "oboard-menu-hidden"
 		hideMenu: ->
 			$(@menu).addClass "oboard-menu-hidden"
+		addTutorialName: (name)->
+			element = $("<div class=\"oboard-menu-item\">#{name}</div>")
+			element.insertBefore "#oboard-menu-close"
+			element.click ->
+				console.log "click"

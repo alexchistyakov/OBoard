@@ -27,7 +27,8 @@ module.exports =
 				req.app.render "oboardclient/menu", {}, (error,content) ->
 					resHtml = content
 				callback true,
-					tutorials: resTutorials
+					oboard:
+						tutorials: resTutorials
 					assets:
 						js: resJs
 						css: resCss
