@@ -79,7 +79,7 @@ window.OBoard =
 			$(@menu).addClass "oboard-menu-hidden"
 			@menuVisible = false
 		addTutorial: (tutorial)->
-			element = $("<div class=\"oboard-menu-item\">#{name}</div>")
+			element = $("<div class=\"oboard-menu-item\">#{tutorial}</div>")
 			element.insertBefore "#oboard-menu-close"
 			element.click ->
 				window.OBoard.ui.hideMenu()
