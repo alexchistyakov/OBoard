@@ -1,3 +1,4 @@
+fs = require "fs"
 module.exports = 
 	get:
 		"load-essentials": (req,user,callback)->
@@ -26,9 +27,16 @@ module.exports =
 				resHtml = null
 				req.app.render "oboardclient/menu", {}, (error,content) ->
 					resHtml = content
+				resBoxesHtml = {}
+				for path in fs.readdirSync "#{__dirname}/../../views/boxes"
+					name = path.substring 0, path.indexOf "."
+					req.app.render "boxes/#{name}", {}, (error,content) ->
+						resBoxesHtml[name] = content
+
 				callback true,
 					oboard:
 						tutorials: resTutorials
+						boxesHtml: resBoxesHtml
 					assets:
 						js: resJs
 						css: resCss
@@ -54,7 +62,7 @@ module.exports =
 							if req.param "host" is not tutorial.host
 								callback false, "Tutorial is bound to another host"
 							else unless tutorial.owner_id is user.id
-								callback false, "User secret invalid or tutorial does not belong to user"
+								callback false, "Tutorial does not belong to user"
 							else if err
 								callback false, err.message
 							else
@@ -63,22 +71,15 @@ module.exports =
 									boxes: []
 								req.models.boxes.find
 									tutorial_id: tutorial.id
+									bound_path: req.param "path"
 								, (err,boxes) ->
-									console.log boxes
-									fromBox = req.param("frombox") || 0
-									toBox = req.param("tobox") || boxes.length-1
-									if (fromBox < 0) or (fromBox > boxes.length-1)
-										callback false, "frombox is invalid: "+fromBox
-									else if (toBox < 0) or (toBox > boxes.length-1)
-										callback false, "tobox is invalid: "+toBox
-									else if fromBox > toBox
-										callback false, "frombox is greater than tobox"
-									else
-										for i in [fromBox..toBox]
-											element = 
-												order_id: boxes[i].order_id
-												text: boxes[i].text
-												bound_id: boxes[i].bound_id
-												popup: boxes[i].popup
-											res.boxes.push element
-										callback true, res
+									for box in boxes
+										element = 
+											order_id: box.order_id
+											text: box.text
+											bound_id: box.bound_id
+											popup: box.popup
+											next_button: box.next_button
+											arrow_side: box.arrow_side
+										res.boxes.push element
+									callback true, res

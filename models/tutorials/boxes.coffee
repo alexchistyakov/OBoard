@@ -4,9 +4,9 @@ module.exports = (db,models) ->
 			type: "integer"
 		text : String
 		bound_id : String
-		popup: Boolean
-		next_button: Boolean
+		type: String
 		arrow_side: 
 			type: "integer"
+		bound_path: String
 	,
 		timestamp: true
