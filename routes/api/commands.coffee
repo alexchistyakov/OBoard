@@ -81,5 +81,6 @@ module.exports =
 											popup: box.popup
 											next_button: box.next_button
 											arrow_side: box.arrow_side
+											type: box.type
 										res.boxes.push element
 									callback true, res

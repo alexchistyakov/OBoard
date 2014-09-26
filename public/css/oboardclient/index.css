@@ -58,7 +58,7 @@
 	border: 2px solid #fff;
 }
 .oboard-box:after, .oboard_box:before {
-	right: 100%;
+	top: 100%;
 	left: 50%;
 	border: solid transparent;
 	content: " ";
