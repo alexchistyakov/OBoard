@@ -63,6 +63,8 @@ module.exports =
 								callback false, "Tutorial is bound to another host"
 							else unless tutorial.owner_id is user.id
 								callback false, "Tutorial does not belong to user"
+							else unless tutorial.host in user.hosts
+								callback false, "Tutorials host is not in users allowed hosts"
 							else if err
 								callback false, err.message
 							else
