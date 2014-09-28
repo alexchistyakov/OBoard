@@ -77,7 +77,8 @@ module.exports =
 										element = 
 											order_id: box.order_id
 											text: box.text
-											bound_id: box.bound_id
+											x: box.x
+											y: box.y
 											popup: box.popup
 											next_button: box.next_button
 											arrow_side: box.arrow_side

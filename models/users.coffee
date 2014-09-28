@@ -14,6 +14,8 @@ module.exports = (db,models) ->
 		password:
 			type: "text"
 			required: true
+		hosts:
+			type: "object"
 		stripe: String
 	,
 		timestamp: true

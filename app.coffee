@@ -40,7 +40,7 @@ app.use bodyParser.urlencoded
     extended: false
 
 app.use "/img",express.static __dirname+"/public/images"
-app.use "/init",express.static __dirname+"/public/coffee/init/index.js"
+app.use "/init",express.static __dirname+"/public/coffee/init"
 
 assets.init app,server
 app.use assets.express

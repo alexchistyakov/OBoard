@@ -53,32 +53,27 @@
 	bottom: -300px;
 }
 .oboard-box {
-	position: relative;
-	background: #fff;
-	border: 2px solid #fff;
+	position: fixed;
+	height:auto;
+	width:auto;
+	min-width: 25px;
+	min-height: 50px;
+	padding: 5px;
+	background: #ffffff;
+	border-radius: 4px;
 }
-.oboard-box:after, .oboard_box:before {
-	top: 100%;
-	left: 50%;
-	border: solid transparent;
+.oboard-box:after {
+	right: 100%;
+	top: 50%;
 	content: " ";
 	height: 0;
 	width: 0;
 	position: absolute;
 	pointer-events: none;
-}
-
-.oboard-box:after {
 	border-color: rgba(255, 255, 255, 0);
-	border-bottom-color: #fff;
+	border-right-color: #ffffff;
 	border-width: 10px;
-	margin-left: -10px;
-}
-.oboard-box:before {
-	border-color: rgba(196, 245, 199, 0);
-	border-bottom-color: #fff;
-	border-width: 13px;
-	margin-left: -13px;
+	margin-top: -10px;
 }
 .oboard-box .oboard-close-button {
 	background: url("/img/closebutton.png");

@@ -42,8 +42,8 @@ window.OBoard =
 			throw new Error "OBoard not initialized"
 
 	ui:
-		menuButton: "#oboard-menubutton"
-		menu: "#oboard-menu"
+		menuButton: $("#oboard-menubutton")
+		menu: $("#oboard-menu")
 		boxesHtml: {}
 		menuVisible: true
 		initalize: (tutorials,boxesHtml)->
@@ -72,7 +72,6 @@ window.OBoard =
 		showMenu: ->
 			$(@menu).show
 				complete: =>
-					console.log "Doing"
 					@menuVisible = true
 					$(@menu).removeClass "oboard-menu-hidden"
 		hideMenu: ->
@@ -90,6 +89,8 @@ window.OBoard =
 			jbox = $(@boxesHtml[box.type])
 			console.log @boxesHtml[box.type]
 			jbox.text box.text
-			$("#"+box.bound_id).append jbox
+			jbox.css "top", "#{box.y}"
+			jbox.css "right","#{box.x}"
+			$("body").append jbox
 		clearBoxes: ->
 			$(".oboard-box").remove()

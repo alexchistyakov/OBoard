@@ -10,6 +10,10 @@ module.exports.expressGet = (req,res,next) ->
 				res.json
 					success: false
 					message: "Invalid user secret"
+			unless req.param "host" in user.hosts
+				res.json
+					success: false
+					message: "Host not permitted access by user"
 			else
 				command req,user, (success,data) ->
 					res.json
