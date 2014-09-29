@@ -22,4 +22,7 @@
         "user": "oboard",
         "password": "oboard78"
     }
+    "stripe": {
+
+    }
 }

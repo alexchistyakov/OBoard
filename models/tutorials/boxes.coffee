@@ -3,10 +3,7 @@ module.exports = (db,models) ->
 		order_id : 
 			type: "integer"
 		text : String
-		x: 
-			type: "integer"
-		y:
-			type: "integer"
+		bound_id : String
 		type: String
 		arrow_side: 
 			type: "integer"
