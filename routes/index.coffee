@@ -2,6 +2,7 @@ express = require 'express'
 authPage = require "./auth"
 authHandler = require "./auth/authentication"
 api = require "./api"
+purchase = require "./purchase"
 router = express.Router();
 
 # GET home page. 
@@ -23,6 +24,8 @@ router.get "/register", authPage.registerPage
 router.post "/register", authHandler.authenticateRegister
 
 router.get "/logout", authHandler.logout
+
+router.get "/purchase", purchase
 
 module.exports = router
 

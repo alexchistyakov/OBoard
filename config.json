@@ -21,8 +21,9 @@
         "database": "oboard",
         "user": "oboard",
         "password": "oboard78"
-    }
+    },
     "stripe": {
-
+        "production":"not yet",
+        "development": "pk_test_z0UfeI4dB8HO4Tgd2lQElJih"
     }
 }

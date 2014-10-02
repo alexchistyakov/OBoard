@@ -1,9 +1,14 @@
-body {
-	text-align: center;
+body{
+	font-family: "proxima-nova","Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 body .popup {
 	text-align: left;
 	width: 280px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 2;
 }
 body .popup .form {
 	overflow: hidden;
@@ -49,4 +54,4 @@ body .popup .form .button {
     color: #fff;
     cursor: pointer;
     border: solid 1px #ddd;
-}	
+}

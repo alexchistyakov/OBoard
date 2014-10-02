@@ -1,12 +1,49 @@
-$ ->
-	$(".popup .form").submit (e) ->
-		e.preventDefault()
-		e.stopPropagation()
+window.oboardXHRRequest = (params, action, callback,url) ->
+	xhr = null
+	full_url = oboardUrl
+	full_params = ""
 
-		form = $ @
+	for key,value of params
+		unless full_params is ""
+			full_params += "&"
+		if value?
+			full_params += "#{key}=#{encodeURIComponent value}"
 
-		$.post $(@).attr("action"), $(@).serialize(),  (response) ->
-			unless response.success
-				form.find(".error-message").eq(0).html response.message
-			else
-				window.location.href = response.redirect
+	if action is "GET"
+		full_url += "?" + full_params
+
+	if XMLHttpRequest?
+		xhr = new XMLHttpRequest()
+	else
+		versions = [
+			"MSXML2.XmlHttp.5.0",
+			"MSXML2.XmlHttp.4.0",
+			"MSXML2.XmlHttp.3.0",
+			"MSXML2.XmlHttp.2.0",
+			"Microsoft.XmlHttp"
+		]
+
+		for i in [0..versions.length]
+			try
+				xhr = new ActiveXObject versions[i]
+				break
+			catch e
+				return callback false
+	
+	xhr.onreadystatechange = ->
+		if xhr.readyState < 4 or xhr.status is not 200
+			return callback false
+		else if xhr.readyState is 4
+			return callback xhr.response
+		else
+			return callback false
+		
+
+	xhr.withCredentials = true;
+	xhr.open(action, full_url, true);
+	xhr.responseType = "json";
+
+	unless action is "GET"
+		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+	xhr.send(full_params);

@@ -5,57 +5,11 @@
     element = document.getElementById("oboard-js");
     oboardUrl = "http://localhost/api";
     oboardRequest = function(params, action, callback) {
-      var e, full_params, full_url, i, key, value, versions, xhr, _i, _ref;
-      xhr = null;
-      full_url = oboardUrl;
-      full_params = "";
       params.userSecret = element.getAttribute("data-key");
       params.host = window.location.hostname;
       params.path = window.location.pathname;
       params.port = window.location.port;
-      console.log(params);
-      for (key in params) {
-        value = params[key];
-        if (full_params !== "") {
-          full_params += "&";
-        }
-        if (value != null) {
-          full_params += "" + key + "=" + (encodeURIComponent(value));
-        }
-      }
-      if (action === "GET") {
-        full_url += "?" + full_params;
-      }
-      if (typeof XMLHttpRequest !== "undefined" && XMLHttpRequest !== null) {
-        xhr = new XMLHttpRequest();
-      } else {
-        versions = ["MSXML2.XmlHttp.5.0", "MSXML2.XmlHttp.4.0", "MSXML2.XmlHttp.3.0", "MSXML2.XmlHttp.2.0", "Microsoft.XmlHttp"];
-        for (i = _i = 0, _ref = versions.length; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-          try {
-            xhr = new ActiveXObject(versions[i]);
-            break;
-          } catch (_error) {
-            e = _error;
-            return callback(false);
-          }
-        }
-      }
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState < 4 || xhr.status === !200) {
-          return callback(false);
-        } else if (xhr.readyState === 4) {
-          return callback(xhr.response);
-        } else {
-          return callback(false);
-        }
-      };
-      xhr.withCredentials = true;
-      xhr.open(action, full_url, true);
-      xhr.responseType = "json";
-      if (action !== "GET") {
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      }
-      return xhr.send(full_params);
+      return oboardXHRRequest(params, action, callback, oboardUrl);
     };
     return oboardRequest({
       command: "load-essentials"

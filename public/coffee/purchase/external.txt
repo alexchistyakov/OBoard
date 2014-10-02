@@ -1,0 +1,1 @@
+https://checkout.stripe.com/checkout.js

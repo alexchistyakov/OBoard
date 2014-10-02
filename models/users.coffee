@@ -31,14 +31,13 @@ module.exports = (db,models) ->
 		methods:
 			hash: (data) ->
 				crypto.createHash("md5").update(data).digest("hex")
-			addStripe: =>
-				# ---- Coming soon ---- #
-				###stripe.customers.create 
+			addStripe: ->
+				stripe.customers.create 
 					email: @email
 				, (error,customer)=>
 					if not err and customer
 						@stripe = customer.id
-						@save()###
+						@save()
 		validations:
 			pub_id: db.enforce.unique()
 			email: [
