@@ -1,6 +1,7 @@
+window.oboardRootUrl = "http://localhost"
 window.oboardXHRRequest = (params, action, callback,url) ->
 	xhr = null
-	full_url = oboardUrl
+	full_url = url
 	full_params = ""
 
 	for key,value of params

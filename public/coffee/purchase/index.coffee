@@ -13,6 +13,11 @@ $ ->
 				key: 'pk_test_z0UfeI4dB8HO4Tgd2lQElJih'
 				token: (token)=>
 					tokenReceived = true
+					oboardXHRRequest 
+						token: token
+					, "POST", ->
+						window.location.href = "#{oboardRootUrl}/purchasestatus"
+					, "#{oboardRootUrl}/purchase"
 			handler.open 
 				name: "OBoard"
 				description: "OBoard Service ($20.00)"
@@ -20,9 +25,7 @@ $ ->
 				opened: ->
 					clearTimeout timeout
 				closed: ->
-					if tokenReceived
-
-					else
+					unless tokenReceived
 						$(".purchase-loading-text").text "You have closed the form. Please refresh the page to retry"
 
 	, 10
