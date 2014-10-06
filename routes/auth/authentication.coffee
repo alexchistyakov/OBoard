@@ -69,6 +69,7 @@ module.exports.register = (req,email,password,done) ->
 							success: false
 							message: "Username already in use"
 					else
+						console.log err
 						done null,null,
 							success: false
 							message: "Email is invalid"

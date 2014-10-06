@@ -26,7 +26,7 @@ router.post "/register", authHandler.authenticateRegister
 router.get "/logout", authHandler.logout
 
 router.get "/purchase", purchase.loadPurchasePage
-router.post "/purchase". purchase.doPurchase
+router.post "/purchase", purchase.doPurchase
 
 module.exports = router
 

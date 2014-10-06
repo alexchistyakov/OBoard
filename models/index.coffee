@@ -9,13 +9,17 @@ module.exports.express = orm.express config.database,
 		models.tutorials = require("./tutorials")(db,models)
 		models.boxes = require("./tutorials/boxes")(db,models)
 		models.users = require("./users")(db,models)
+		models.projects = require("./projects")(db,models)
 
 		models.boxes.hasOne "tutorial",models.tutorials, 
 			reverse : "boxes"
 
-		models.tutorials.hasOne "owner",models.users,
-			reverse : "tutorials"
-			
+		models.projects.hasOne "owner",models.users,
+			reverse : "projects"
+		
+		models.tutorials.hasOne "project",models.projects,
+			reverse: "tutorials"
+		
 		unless init
 			async.series [
 				(next) =>

@@ -13,11 +13,7 @@ $ ->
 				key: 'pk_test_z0UfeI4dB8HO4Tgd2lQElJih'
 				token: (token)=>
 					tokenReceived = true
-					oboardXHRRequest 
-						token: token
-					, "POST", ->
-						window.location.href = "#{oboardRootUrl}/purchasestatus"
-					, "#{oboardRootUrl}/purchase"
+					$("<form method=\"post\" action=\"#{oboardRootUrl}/purchase\"><input type=\"text\" value=\"#{token.id}\"></form>").submit()
 			handler.open 
 				name: "OBoard"
 				description: "OBoard Service ($20.00)"

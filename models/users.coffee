@@ -14,8 +14,8 @@ module.exports = (db,models) ->
 		password:
 			type: "text"
 			required: true
-		hosts:
-			type: "object"
+		plan:
+			type: "text"
 		stripe: String
 	,
 		timestamp: true
@@ -23,11 +23,12 @@ module.exports = (db,models) ->
 			beforeCreate: ->
 				@pub_id = rand.generateKey Math.floor(Math.random() * 15) + 15
 				@password = @hash @password
-			afterCreate: (success) ->
-				if success
-					@addStripe()
+				unless @plan?
+					@plan = "free"
+				unless @hosts?
+					@hosts = {}
 			beforeSave: ->
-				@username = @username.capitalize()
+				@username = @username.capitalize()	
 		methods:
 			hash: (data) ->
 				crypto.createHash("md5").update(data).digest("hex")

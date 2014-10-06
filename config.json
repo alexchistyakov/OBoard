@@ -10,7 +10,9 @@
         "description":[
             "Onboarding done right"
         ],
-        "production": false
+        "production": false,
+        "price":2000,
+        "currency":"usd"
 	},
 	"database": {
         "reset": false,
