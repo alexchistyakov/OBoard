@@ -1,8 +1,7 @@
 module.exports = (req,res,next) ->
 	req.models.tutorials.create
-		owner_id: 1
+		project_id: 1
 		name: "Test"
-		host: "localhost"
 	,(err) ->
 		console.log err
 
@@ -10,7 +9,17 @@ module.exports = (req,res,next) ->
 		tutorial_id: 1
 		text: "Hello world"
 		order_id: 0
-		popup: false
-		bound_id: "crazy-div"
+		type: "simple"
+		x: "100"
+		y: "100"
+		arrow_side: 3
+		bound_path: "/"
 	,(err) ->
+		console.log err
+
+	req.models.projects.create
+		owner_id: 1
+		name: "Localhost"
+		host: "http://localhost"
+	, (err) ->
 		console.log err

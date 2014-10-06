@@ -1,9 +1,9 @@
 fs = require "fs"
 module.exports = 
 	get:
-		"load-essentials": (req,user,callback)->
+		"load-essentials": (req,user,project,callback)->
 			req.models.tutorials.find
-				owner_id: user.id
+				project_id: project.id
 			, (err,tutorials) ->
 				resTutorials = []
 				for tutorial in tutorials
@@ -43,7 +43,7 @@ module.exports =
 					content: resHtml
 				
 
-		"load-tutorial": (req,user,callback)->
+		"load-tutorial": (req,user,project,callback)->
 			tutorial_id = req.param("tutorial_id")
 			unless tutorial_id?
 				callback false, 
@@ -59,12 +59,10 @@ module.exports =
 						req.models.tutorials.one
 							pub_id: tutorial_id
 						, (err, tutorial) ->
-							if req.param "host" is not tutorial.host
+							if req.param "host" is not project.host
 								callback false, "Tutorial is bound to another host"
-							else unless tutorial.owner_id is user.id
-								callback false, "Tutorial does not belong to user"
-							else unless tutorial.host in user.hosts
-								callback false, "Tutorials host is not in users allowed hosts"
+							else unless tutorial.project_id is project.id
+								callback false, "Tutorial does not belong to project"
 							else if err
 								callback false, err.message
 							else

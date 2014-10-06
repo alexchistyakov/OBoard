@@ -44,7 +44,6 @@ app.use "/init",express.static __dirname+"/public/coffee/init"
 
 assets.init app,server
 app.use assets.express
-
 app.use session
     secret: process.env.SESSION_SECRET or "devsecret"
     resave: true

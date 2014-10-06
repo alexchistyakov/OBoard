@@ -6,9 +6,6 @@ module.exports = (db,models) ->
 		name : 
 			type: "text"
 			required: true
-		host : 
-			type: "text"
-			required: true
 	},{
 		timestamp: true
 		hooks:
