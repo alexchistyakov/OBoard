@@ -2,7 +2,9 @@ module.exports = (db,models) ->
 	db.define "boxes", 
 		order_id : 
 			type: "integer"
+		header: String
 		text : String
+		bound_id: String
 		x:
 			type: "integer"
 		y:

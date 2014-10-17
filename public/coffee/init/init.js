@@ -56,6 +56,7 @@
       oboardUrl = "" + oboardRootUrl + "/api";
       oboardRequest = function(params, action, callback) {
         params.userSecret = element.getAttribute("data-key");
+        params.project_id = element.getAttribute("project-id");
         params.host = window.location.hostname;
         params.path = window.location.pathname;
         params.port = window.location.port;

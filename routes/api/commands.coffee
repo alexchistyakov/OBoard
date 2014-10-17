@@ -33,10 +33,17 @@ module.exports =
 					req.app.render "boxes/#{name}", {}, (error,content) ->
 						resBoxesHtml[name] = content
 
+				resExtrasHtml = {}
+				for path in fs.readdirSync "#{__dirname}/../../views/boxes/extras"
+					name = path.substring 0, path.indexOf "."
+					req.app.render "boxes/extras/#{name}", {}, (error,content) ->
+						resExtrasHtml[name] = content
+				
 				callback true,
 					oboard:
 						tutorials: resTutorials
 						boxesHtml: resBoxesHtml
+						extrasHtml: resExtrasHtml
 					assets:
 						js: resJs
 						css: resCss
@@ -73,13 +80,15 @@ module.exports =
 									tutorial_id: tutorial.id
 									bound_path: req.param "path"
 								, (err,boxes) ->
+									console.log tutorial.id
 									for box in boxes
 										element = 
 											order_id: box.order_id
 											text: box.text
-											x: box.x
-											y: box.y
-											popup: box.popup
+											bound_id: box.bound_id
+											data:
+												x: box.x
+												y: box.y
 											next_button: box.next_button
 											arrow_side: box.arrow_side
 											type: box.type

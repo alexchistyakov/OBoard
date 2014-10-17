@@ -1,45 +1,134 @@
-.oboard-menubutton{
-	background-image: url("/img/menubutton.png");
+.oboard-menubutton, .oboard-close-tutorial-button{
 	width: 40px;
 	height: 40px;
-	position: fixed;
+	color: #fff;
 	right:0;
 	bottom:0;
 	margin-right: 20px;
+	position: fixed;
+	border-radius: 10px 10px 0 0;
 	-webkit-transition: bottom .5s;
 	transition: bottom .5s;
+	cursor: pointer;
+	text-align: center;
+}
+
+.oboard-menubutton{
+	background-color: #10B055;
+	font-size: 35px;
+}
+.oboard-close-tutorial-button{
+	background-color: #C70202;
+	font-size: 30px;
+}
+.oboard-darken-overlay{
+	position: fixed;
+	top:0;
+	left:0;
+	width: 100%;
+	height: 100%;
+	opacity: 0.3;
+	background: #000;
+	z-index: 2779;
+}
+.oboard-popup{
+	min-width: 200px;
+	min-height: 100px;
+	height:auto;
+	max-height: 500px;
+	max-width: 500px;
+	overflow: auto;
+	position:fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	box-shadow: 0 0 10px #aaa;
+	border-radius: 5px;
+	background: #efefef;
+	border: solid 1px #aaa;
+	z-index: 2780;
+}
+.oboard-popup .oboard-popup-header{
+	font-family: "Verdana", Verdana, sans-serif;
+	font-size: 20px;
+	border-bottom: solid 1px #aaa;
+	color: #555;
+	background: #ddd;
+	padding: 10px;
+}
+.oboard-popup .oboard-popup-body {
+	padding: 10px;
+	margin-bottom: 10px;
+}
+.oboard-button-container{
+	width: 100%;
+	height: 30px;
+	margin-top: 10px;
+}
+.oboard-button-container .oboard-next-button{
+	width: 55px;
+	height: 20px;
+	background-color: #8b8;
+	text-align: center;
+	position: absolute;
+	right:0;
+	bottom: 0;
+	color:#fff;
+	margin: 5px;
+	border: solid transparent;
+	border-radius: 7px;
+	cursor:pointer;
+}
+.oboard-button-container .oboard-cancel-button{
+	width: 55px;
+	height: 20px;
+	background-color: #b88;
+	text-align: center;
+	position: absolute;
+	right: 65px;
+	bottom: 0;
+	color:#fff;
+	margin: 5px;
+	border: solid transparent;
+	border-radius: 7px;
 	cursor:pointer;
 }
 .oboard-menu {
 	width: 300px;
 	height: 300px;
-	overflow: auto;
+	overflow: visible;
 	position: fixed;
 	right:0;
 	bottom:0;
 	margin-right: 20px;
+	font-family: "Verdana", Verdana, sans-serif;
 	-webkit-transition: bottom .5s;
 	transition: bottom .5s;
-	background: #eee;
+	background: #fff;
 	border-radius: 5 5 0 0;
+	border: solid 1px #aaa;
 }
 .oboard-menu .oboard-menu-header{
-	width: 100%;
 	height: 20px;
 	background: #ddd;
+	text-align: center;
 	border-bottom: solid 1px #aaa;
 	padding: 10px 0;
+	color: #666;
 }
 .oboard-menu .oboard-menu-hidebutton{
 	width: 100%;
 	height: 20px;
 	background: #ddd;
 	position: absolute;
+	text-align: center;
+	border-top: solid 1px #aaa;
+	color: #aaa;
 	bottom:0;
 	cursor:pointer;
+	padding: 2px 0;
 }
 .oboard-menu .oboard-menu-item{
-	width: 100%;
 	height: 30px;
 	border-bottom: solid 1px #bbb;
 	padding-top: 10px;
@@ -53,34 +142,46 @@
 	bottom: -300px;
 }
 .oboard-box {
-	position: fixed;
+	position: absolute;
 	height:auto;
 	width:auto;
 	min-width: 25px;
 	min-height: 50px;
-	padding: 5px;
+	padding: 10px;
 	background: #ffffff;
 	border-radius: 4px;
+	z-index: 2470;
+	box-shadow: 0 0 10px #aaa;
 }
-.oboard-box:after {
+.oboard-box:after,.oboard-box:before {
 	right: 100%;
 	top: 50%;
+	border: solid 1px #dedede;
 	content: " ";
 	height: 0;
 	width: 0;
 	position: absolute;
 	pointer-events: none;
-	border-color: rgba(255, 255, 255, 0);
+	z-index: 2778;
+}
+.oboard-box:before {
+	border-color: rgba(219, 219, 219, 0);
+	border-right-color: #dedede;
+	border-width: 8px;
+	margin-top: -8px;
+}
+.oboard-box:after {
+	border-color: rgba(219, 219, 219, 0);
 	border-right-color: #ffffff;
-	border-width: 10px;
-	margin-top: -10px;
+	border-width: 7px;
+	margin-top: -7px;
 }
 .oboard-box .oboard-close-button {
 	background: url("/img/closebutton.png");
 	width: auto;
 	height: auto;
 }
-.oboard-box .oboard-next-button {
+.oboard-box .oboard-box-next-button {
 	width: 200px;
 	height: 100px;
 	background-color: #8b8;

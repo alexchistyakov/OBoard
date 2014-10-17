@@ -1,6 +1,8 @@
 <% include ./includes/start.html %>
 	<% if(isAuthenticated) { %>
 		Hello, <%- user.username -%>!
+		<br>
+		<a href="/logout">Logout</a>
 	<% } else {
 		console.log(user)%> 
 		<a href="/login">Click here to login</a><br>

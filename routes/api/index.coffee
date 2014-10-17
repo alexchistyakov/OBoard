@@ -11,16 +11,20 @@ module.exports.expressGet = (req,res,next) ->
 					success: false
 					message: "Invalid user secret"
 			else 
+				console.log req.param "project_id"
+				console.log user.id
 				req.models.projects.one 
 					pub_id: req.param "project_id"
 					owner_id: user.id
 				, (err,project) ->
+					if err
+						console.log err
 					unless project?
 						res.json 
 							success: false
 							message: "Project not found or does not belong to user"
 					else
-						command req,user,project (success,data) ->
+						command req,user,project, (success,data) ->
 							res.json
 								success: success
 								data: data

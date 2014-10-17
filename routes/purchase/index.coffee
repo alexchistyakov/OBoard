@@ -25,7 +25,6 @@ module.exports.doPurchase = (req,res,next) ->
 				js: ""
 				text: "Your purchase could not be completed. Error: #{err.message}"
 		else
-			
 			res.render "purchase/index",
 				title: "Purchase Status"
 				css: req.css.renderTags "purchase"
