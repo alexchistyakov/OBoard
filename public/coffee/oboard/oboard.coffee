@@ -58,7 +58,6 @@ window.OBoard =
 		menuButton: "#oboard-menubutton"
 		menu: "#oboard-menu"
 		closeTutorialButton: "#oboard-close-tutorial-button"
-		boxesHtml: {}
 		menuVisible: true
 		initalize: (tutorials,boxesHtml,extrasHtml)->
 			$(@menuButton).click ->
@@ -113,10 +112,11 @@ window.OBoard =
 					@showCloseTutorialButton()
 					@hideMenuButton()
 		renderBox: (box) ->
-			@boxRenderer.boxes[box.type].render $("body"),@boxRenderer.boxes[box.type].element()
-
-		clearBoxes: ->
-			@boxRenderer.removeStandard()
+			boxClass = @boxRenderer.createBox box.type,box.bound_id,box.text,box.data
+			header = @boxRenderer.createExtra "header", boxClass,
+				text: "Testing shit"
+			boxClass.extra header
+			boxClass.render()
 		showCloseTutorialButton: ->
 			$(@closeTutorialButton).show
 				complete: =>
@@ -125,75 +125,127 @@ window.OBoard =
 			$(@closeTutorialButton).addClass "oboard-menubutton-hidden"
 
 		renderPopup: (header,text,cancel,callback) ->
-			@removePopup()
-			$popup = @boxRenderer.boxes.boxpopup.element "Do you want to exit the tutorial?"
-			@boxRenderer.extras.header.add $popup,
+			popup = @boxRenderer.createBox "boxpopup",null,"Do you want to exit the tutorial?", null
+			header = @boxRenderer.createExtra "header",popup,
 				text: "Are you sure?"
-			@boxRenderer.extras.promptbuttons.add $popup,
+			promptbuttons = @boxRenderer.createExtra "promptbuttons",popup,
 				callback: (status) =>
 					if status
 						OBoard.unloadAndEndTutorial()
 						@hideCloseTutorialButton()
 						@showMenuButton()
-					@removePopup()
-
-			@boxRenderer.boxes.boxpopup.render $("body"), $popup
+						@boxRenderer.clearBoxes()
+					@boxRenderer.removeBox popup
+			popup.extra promptbuttons
+			popup.extra header
+			popup.render()
+			
 
 		removePopup: ->
-			@boxRenderer.boxes.boxpopup.remove()
+			@boxRenderer.clearBoxes()
 		boxRenderer:
 			boxHtml: {}
 			extrasHtml: {}
-			removeStandard: ->
-				$(".oboard-box").remove()
+			activeBoxes: []
+			createBox: (type,parent,text,data) ->
+				new @boxes[type] parent,text,data
+			createExtra: (type,box,data) ->
+				new @extras[type] box,data
+			clearBoxes: ->
+				for box in @activeBoxes
+					box.unrender()
+				activeBoxes = []
+			removeBox: (box) ->
+				box.unrender()
+				@activeBoxes.pop box
 			boxes:
-				boxsimple:
-					render: ($parent,element) ->
-						$parent.append element
-					element: (text,data) ->
-						jbox = $(OBoard.ui.boxRenderer.boxesHtml["boxsimple"])
-						jbox.text text
-						jbox.css "top", "#{data.y}"
-						jbox.css "right","#{data.x}"
+				boxsuperclass: class Box
+					constructor: (parent,text,data,type)->
+						@text = text
+						@data = data
+						console.log data
+						@parent = parent
+						@html = OBoard.ui.boxRenderer.boxesHtml[type]
+						@extras = []
+					render: ->
+						OBoard.ui.boxRenderer.activeBoxes.push @
+						$element = @element()
+						@appendExtras $element
+						@appendToParent $element
+					appendToParent: ($element)->
+						if @parent?
+							@parent.append $element
+						else
+							$("body").append $element
+					appendExtras: ($element) ->
+						for extra in @extras
+							extra.append $element
+					element: ->
+						$("")
+					unrender: ->
+
+					extra: (extra)->
+						@extras.push extra
+				boxsimple: class BoxSimple extends Box
+					constructor: (parent,text,data) ->
+						super parent,text,data, "boxsimple"
+					element: ->
+						jbox = $(@html)
+						jbox.text @text
+						jbox.css "top", "#{@data.y}"
+						jbox.css "right","#{@data.x}"
 						jbox
-					remove: ->
-						OBoard.ui.boxRenderer.removeStandard()
+					unrender: ->
+						$(".oboard-box").remove()
 
 
-				boxpopup:
-					overlay: null
-					render: ($parent,element) ->
-						$parent.append $(@overlay)
-						$parent.append element
-					element: (text,data) ->
-						$popup = $(OBoard.ui.boxRenderer.boxesHtml["boxpopup"])
-						$popup.find(".oboard-popup-body").text text
-						@overlay = $popup.get 0
-						$($popup.get(2))
-					remove: ->
+				boxpopup: class BoxPopup extends Box
+					constructor: (parent,text,data) ->
+						super parent,text,data, "boxpopup"
+					appendExtras: ($element) ->
+						for extra in @extras
+							extra.append $($element.get 2)
+					element: ->
+						$popup = $(@html)
+						$popup.find(".oboard-popup-body").text @text
+						$popup
+					unrender: ->
 						$(".oboard-popup").remove()
-						$(@overlay).remove()
+						$(".oboard-darken-overlay").remove()
 
 			extras:
-				header:
-					add: (box,data)->
-						$header = $(OBoard.ui.boxRenderer.extrasHtml["header"])
-						$header.append data.text
-						box.prepend $header
-				okbutton:
-					add: (box,data) ->
-						$button = $(extrasHtml["okbutton"])
-						box.append $button
+				extrasuperclass: class Extra
+					constructor: (box,data,type) ->
+						@box = box
+						@data = data
+						@html = OBoard.ui.boxRenderer.extrasHtml[type]
+					append: ($element)->
+						$("")
+				header: class Header extends Extra
+					constructor: (box,data) ->
+						super box,data, "header"
+					append: ($element)->
+						$header = $(@html)
+						$header.append @data.text
+						$element.prepend $header
+				okbutton: class OkButton extends Extra
+					constructor: (box,data) ->
+						super box,data, "okbutton"
+					append: ($element) ->
+						$button = $(@html)
+						$element.append $button
 						$button.find("#oboard-next-button").click =>
-							data.callback()
-				promptbuttons:
-					add: (box,data) ->
-						$buttons = $(OBoard.ui.boxRenderer.extrasHtml["promptbuttons"])
-						box.append $buttons
+							@data.callback()
+				promptbuttons: class PromptButtons extends Extra
+					constructor: (box,data) ->
+						super box,data, "promptbuttons"
+					append: ($element) ->
+						$buttons = $(@html)
+						$element.append $buttons
 						$buttons.find("#oboard-next-button").click =>
-							data.callback true
+							@data.callback true
 						$buttons.find("#oboard-cancel-button").click =>
-							data.callback false
+							@data.callback false
 
 
 
