@@ -27,6 +27,9 @@ module.exports =
 				resHtml = null
 				req.app.render "oboardclient/menu", {}, (error,content) ->
 					resHtml = content
+				resMenuItemHtml = null
+				req.app.render "oboardclient/element", {}, (error,content)->
+					resMenuItemHtml = content
 				resBoxesHtml = {}
 				for path in fs.readdirSync "#{__dirname}/../../views/boxes"
 					name = path.substring 0, path.indexOf "."
@@ -44,6 +47,7 @@ module.exports =
 						tutorials: resTutorials
 						boxesHtml: resBoxesHtml
 						extrasHtml: resExtrasHtml
+						menuItemHtml: resMenuItemHtml
 					assets:
 						js: resJs
 						css: resCss
@@ -92,5 +96,6 @@ module.exports =
 											next_button: box.next_button
 											arrow_side: box.arrow_side
 											type: box.type
+											extras: box.extras
 										res.boxes.push element
 									callback true, res

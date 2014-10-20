@@ -2,7 +2,6 @@ module.exports = (db,models) ->
 	db.define "boxes", 
 		order_id : 
 			type: "integer"
-		header: String
 		text : String
 		bound_id: String
 		x:
@@ -13,5 +12,6 @@ module.exports = (db,models) ->
 		arrow_side: 
 			type: "integer"
 		bound_path: String
+		extras: Object
 	,
 		timestamp: true

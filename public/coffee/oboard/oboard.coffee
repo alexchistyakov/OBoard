@@ -12,7 +12,7 @@ window.OBoard =
 		@oboardUrl = url
 		for tutorial in data.tutorials
 			@tutorials[tutorial.name] = tutorial.tutorial_id
-		@ui.initalize @tutorials, data.boxesHtml, data.extrasHtml
+		@ui.initialize @tutorials, data.boxesHtml, data.extrasHtml, data.menuItemHtml
 		@initialized = true
 
 	loadTutorial: (pub_id,path,callback) ->
@@ -55,74 +55,19 @@ window.OBoard =
 			throw new Error "OBoard not initialized"
 
 	ui:
-		menuButton: "#oboard-menubutton"
-		menu: "#oboard-menu"
-		closeTutorialButton: "#oboard-close-tutorial-button"
-		menuVisible: true
-		initalize: (tutorials,boxesHtml,extrasHtml)->
-			$(@menuButton).click ->
-				window.OBoard.ui.showMenu()
-				window.OBoard.ui.hideMenuButton()
-			$("#oboard-menu-close").click ->
-				window.OBoard.ui.showMenuButton()
-				window.OBoard.ui.hideMenu()
-			$(@closeTutorialButton).click =>
-				@renderPopup "Are you sure?", "Would you like to exit the tutorial?", true, (status) ->
-					if status
-						OBoard.ui.clearBoxes()
-						OBoard.unloadAndEndTutorial()
-						OBoard.ui.hideCloseTutorialButton()
-						OBoard.ui.showMenuButton()
-			$(@menu).bind "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", =>
-				console.log "Menu "+ @menuVisible
-				unless @menuVisible
-					$(@menu).hide()
-			$(@menuButton).bind "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", =>
-				if @menuVisible
-					$(@menuButton).hide()
-			$(@closeTutorialButton).bind "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", =>
-				unless OBoard.inTutorial()
-					$(@closeTutorialButton).hide()
-			@boxRenderer.boxesHtml = boxesHtml
-			@boxRenderer.extrasHtml = extrasHtml
-			@addTutorial key for key,value of tutorials
-
-			@hideCloseTutorialButton()
-		hideMenuButton: ->
-			$(@menuButton).addClass "oboard-menubutton-hidden"
-		showMenuButton: ->
-			$(@menuButton).show 
-				complete: =>
-					$(@menuButton).removeClass "oboard-menubutton-hidden"
-		showMenu: ->
-			$(@menu).show
-				complete: =>
-					@menuVisible = true
-					$(@menu).removeClass "oboard-menu-hidden"
-		hideMenu: ->
-			$(@menu).addClass "oboard-menu-hidden"
-			@menuVisible = false
-		addTutorial: (tutorial)->
-			element = $("<div class=\"oboard-menu-item\">#{tutorial}</div>")
-			element.insertBefore "#oboard-menu-close"
-			element.click =>
-				@hideMenu()
-				OBoard.loadTutorial OBoard.tutorials[tutorial], location.pathname, =>
-					OBoard.startTutorial()
-					@showCloseTutorialButton()
-					@hideMenuButton()
+		initialize: (tutorials,boxesHtml,extrasHtml,menuItemHtml)->
+			@menu.initialize tutorials,menuItemHtml
+			@boxRenderer.initialize boxesHtml,extrasHtml
 		renderBox: (box) ->
 			boxClass = @boxRenderer.createBox box.type,box.bound_id,box.text,box.data
 			header = @boxRenderer.createExtra "header", boxClass,
 				text: "Testing shit"
+			promptbuttons = @boxRenderer.createExtra "okbutton",boxClass,
+				callback: ->
+					null
 			boxClass.extra header
+			boxClass.extra promptbuttons
 			boxClass.render()
-		showCloseTutorialButton: ->
-			$(@closeTutorialButton).show
-				complete: =>
-					$(@closeTutorialButton).removeClass "oboard-menubutton-hidden"
-		hideCloseTutorialButton: ->
-			$(@closeTutorialButton).addClass "oboard-menubutton-hidden"
 
 		renderPopup: (header,text,cancel,callback) ->
 			popup = @boxRenderer.createBox "boxpopup",null,"Do you want to exit the tutorial?", null
@@ -132,8 +77,8 @@ window.OBoard =
 				callback: (status) =>
 					if status
 						OBoard.unloadAndEndTutorial()
-						@hideCloseTutorialButton()
-						@showMenuButton()
+						@menu.hideCloseTutorialButton()
+						@menu.showMenuButton()
 						@boxRenderer.clearBoxes()
 					@boxRenderer.removeBox popup
 			popup.extra promptbuttons
@@ -143,10 +88,75 @@ window.OBoard =
 
 		removePopup: ->
 			@boxRenderer.clearBoxes()
+		menu:
+			menuButton: "#oboard-menubutton"
+			menuWindow: "#oboard-menu"
+			closeTutorialButton: "#oboard-close-tutorial-button"
+			menuVisible: true
+			initialize: (tutorials,menuItemHtml) ->
+				@menuItemHtml = menuItemHtml
+				$(@menuButton).click =>
+					@showMenu()
+					@hideMenuButton()
+				$("#oboard-menu-close").click =>
+					@showMenuButton()
+					@hideMenu()
+				$(@closeTutorialButton).click =>
+					OBoard.ui.renderPopup "Are you sure?", "Would you like to exit the tutorial?", true, (status) =>
+						if status
+							OBoard.ui.clearBoxes()
+							OBoard.unloadAndEndTutorial()
+							@hideCloseTutorialButton()
+							@showMenuButton()
+				$(@menuWindow).bind "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", =>
+					unless @menuVisible
+						$(@menuWindow).hide()
+				$(@menuButton).bind "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", =>
+					if @menuVisible
+						$(@menuButton).hide()
+				$(@closeTutorialButton).bind "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", =>
+					unless OBoard.inTutorial()
+						$(@closeTutorialButton).hide()
+				@addTutorial key for key,value of tutorials
+
+				@hideCloseTutorialButton()
+			hideMenuButton: ->
+				$(@menuButton).addClass "oboard-menubutton-hidden"
+			showMenuButton: ->
+				$(@menuButton).show 
+					complete: =>
+						$(@menuButton).removeClass "oboard-menubutton-hidden"
+			showMenu: ->
+				$(@menuWindow).show
+					complete: =>
+						@menuVisible = true
+						$(@menuWindow).removeClass "oboard-menu-hidden"
+			hideMenu: ->
+				$(@menuWindow).addClass "oboard-menu-hidden"
+				@menuVisible = false
+			addTutorial: (tutorial)->
+				element = $(@menuItemHtml)
+				element.find(".oboard-menu-item-body").text tutorial
+				element.insertBefore "#oboard-menu-close"
+				element.click =>
+					@hideMenu()
+					OBoard.loadTutorial OBoard.tutorials[tutorial], location.pathname, =>
+						OBoard.startTutorial()
+						@showCloseTutorialButton()
+						@hideMenuButton()
+			showCloseTutorialButton: ->
+				$(@closeTutorialButton).show
+					complete: =>
+						$(@closeTutorialButton).removeClass "oboard-menubutton-hidden"
+			hideCloseTutorialButton: ->
+				$(@closeTutorialButton).addClass "oboard-menubutton-hidden"
 		boxRenderer:
 			boxHtml: {}
 			extrasHtml: {}
 			activeBoxes: []
+			initialize: (boxHtml,extrasHtml) ->
+				@boxHtml = boxHtml
+				@extrasHtml = extrasHtml
 			createBox: (type,parent,text,data) ->
 				new @boxes[type] parent,text,data
 			createExtra: (type,box,data) ->
@@ -159,13 +169,13 @@ window.OBoard =
 				box.unrender()
 				@activeBoxes.pop box
 			boxes:
-				boxsuperclass: class Box
+				boxsuperclass: class OBoardBox
 					constructor: (parent,text,data,type)->
 						@text = text
 						@data = data
 						console.log data
 						@parent = parent
-						@html = OBoard.ui.boxRenderer.boxesHtml[type]
+						@html = OBoard.ui.boxRenderer.boxHtml[type]
 						@extras = []
 					render: ->
 						OBoard.ui.boxRenderer.activeBoxes.push @
@@ -186,12 +196,12 @@ window.OBoard =
 
 					extra: (extra)->
 						@extras.push extra
-				boxsimple: class BoxSimple extends Box
+				boxsimple: class OBoardBoxSimple extends OBoardBox
 					constructor: (parent,text,data) ->
 						super parent,text,data, "boxsimple"
 					element: ->
 						jbox = $(@html)
-						jbox.text @text
+						jbox.find(".oboard-box-body").text @text
 						jbox.css "top", "#{@data.y}"
 						jbox.css "right","#{@data.x}"
 						jbox
@@ -199,7 +209,7 @@ window.OBoard =
 						$(".oboard-box").remove()
 
 
-				boxpopup: class BoxPopup extends Box
+				boxpopup: class OBoardBoxPopup extends OBoardBox
 					constructor: (parent,text,data) ->
 						super parent,text,data, "boxpopup"
 					appendExtras: ($element) ->
@@ -214,21 +224,21 @@ window.OBoard =
 						$(".oboard-darken-overlay").remove()
 
 			extras:
-				extrasuperclass: class Extra
+				extrasuperclass: class OBoardExtra
 					constructor: (box,data,type) ->
 						@box = box
 						@data = data
 						@html = OBoard.ui.boxRenderer.extrasHtml[type]
 					append: ($element)->
 						$("")
-				header: class Header extends Extra
+				header: class OBoardHeader extends OBoardExtra
 					constructor: (box,data) ->
 						super box,data, "header"
 					append: ($element)->
 						$header = $(@html)
 						$header.append @data.text
 						$element.prepend $header
-				okbutton: class OkButton extends Extra
+				okbutton: class OBoardOkButton extends OBoardExtra
 					constructor: (box,data) ->
 						super box,data, "okbutton"
 					append: ($element) ->
@@ -236,7 +246,7 @@ window.OBoard =
 						$element.append $button
 						$button.find("#oboard-next-button").click =>
 							@data.callback()
-				promptbuttons: class PromptButtons extends Extra
+				promptbuttons: class OBoardPromptButtons extends OBoardExtra
 					constructor: (box,data) ->
 						super box,data, "promptbuttons"
 					append: ($element) ->
