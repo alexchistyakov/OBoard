@@ -11,6 +11,7 @@
 	transition: bottom .5s;
 	cursor: pointer;
 	text-align: center;
+	z-index: 2147483647;
 }
 
 .oboard-menubutton{
@@ -107,6 +108,7 @@
 	background: #fff;
 	border-radius: 3 3 0 0;
 	border: solid 1px #aaa;
+	z-index: 2147483647;
 }
 .oboard-menu .oboard-menu-header{
 	height: 15px;
@@ -171,6 +173,7 @@
 	box-shadow: 0 0 10px #aaa;
 }
 .oboard-box .oboard-box-body {
+	margin-top: 10px;
 	padding: 0 10px 10px 10px;
 	font-size:12px;
 }
