@@ -34,7 +34,7 @@
 }
 .oboard-popup{
 	min-width: 100px;
-	min-height: 70px;
+	min-height: 50px;
 	height:auto;
 	max-height: 500px;
 	max-width: 500px;
@@ -50,6 +50,7 @@
 	z-index: 2780;
 }
 .oboard-popup .oboard-popup-body {
+	margin-top: 10px;
 	padding: 3px 10px 0px 10px;
 	margin-bottom: 10px;
 	font-size: 12px;
@@ -88,6 +89,7 @@
 	bottom: 0;
 	border-radius: 3px;
 	background: #10B055;
+	margin-top: 3px;
 }
 .oboard-button-container .oboard-cancel-button{
 	right: 50px;
@@ -199,16 +201,4 @@
 	border-right-color: #ffffff;
 	border-width: 7px;
 	margin-top: -7px;
-}
-.oboard-box .oboard-close-button {
-	background: url("/img/closebutton.png");
-	width: auto;
-	height: auto;
-}
-.oboard-box .oboard-box-next-button {
-	width: 200px;
-	height: 100px;
-	background-color: #8b8;
-	border: solid transparent;
-	border-radius: 7px;
 }

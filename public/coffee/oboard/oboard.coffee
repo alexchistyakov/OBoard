@@ -13,22 +13,40 @@ window.OBoard =
 		for tutorial in data.tutorials
 			@tutorials[tutorial.name] = tutorial.tutorial_id
 		@ui.initialize @tutorials, data.boxesHtml, data.extrasHtml, data.menuItemHtml
+		cookie = @getTutorialCookie()
+		if cookie.tutorialId? and cookie.boxIndex?
+			@downloadTutorialData cookie.tutorialId, (tutorial)->
+				if tutorial.boxes[0]? and tutorial.boxes[0].order_id is cookie.boxIndex + 1
+					@loadTutorial tutorial
+					@startTutorial() 
+				else
+					@ui.menu.showMenuButton()
+		else
+			@ui.menu.showMenuButton()
 		@initialized = true
 
-	loadTutorial: (pub_id,path,callback) ->
-		@throwErrUnlessInit()
+	downloadTutorialData: (pub_id,callback) ->
 		params =
 			command: "load-tutorial"
 			tutorial_id: pub_id
-			path: path
+			path: location.pathname
+		
 		@oboardRequest params, "GET", (response) =>
-			console.log response
 			unless response is false
 				unless response.success
 					throw new Error response.data.message
-				@currentTutorial = response.data
-				@currentBoxId = -1
-				callback() if callback?
+				callback response if callback?
+
+	loadTutorial: (tutorial) ->
+		@throwErrUnlessInit()
+		@currentTutorial = tutorial
+		for i in [0..@currentTutorial.boxes.length]
+			for j in [0..@currentTutorial.boxes.length]
+				if @currentTutorial.boxes[i].order_id < @currentTutorial.boxes[j]
+					temp = @currentTutorial.boxes[i]
+					@currentTutorial.boxes[i] = @currentTutorial.boxes[j]
+					@currentTutorial.boxes[j] = temp
+		@currentBoxId = -1
 	unloadAndEndTutorial: ->
 		@throwErrUnlessInit()
 		@ui.boxRenderer.clearBoxes()
@@ -37,7 +55,12 @@ window.OBoard =
 
 	startTutorial: ->
 		@throwErrUnlessInit()
+		unless @inTutorial()
+			throw new Error "Not in tutorial"
 		@currentBoxId = 0;
+		@ui.menu.hideMenu()
+		@ui.menu.showCloseTutorialButton()
+		@ui.menu.hideMenuButton()
 		@ui.renderBox(@currentTutorial.boxes[@currentBoxId]) if @currentTutorial.boxes[@currentBoxId]?
 
 	nextBox: ->
@@ -59,6 +82,36 @@ window.OBoard =
 		unless @initialized
 			throw new Error "OBoard not initialized"
 
+	getTutorialCookie: ->
+		tutorialId = @getCookie "oboardTutorial"
+		boxIndex = @getCookie "oboardTutorialLastBox"
+		{
+			tutorialId: if not not tutorialId then tutorialId else null
+			boxIndex: if not not boxIndex then boxIndex else null
+		} 
+
+	setCookie: (cname, cvalue, exhours) ->
+		date = new Date()
+		date.setTime date.getTime() + (exhours*60*60*1000)
+		expires = "expires="+d.toUTCString()
+		document.cookie = cname + "=" + cvalue + "; " + expires
+	
+	getCookie: (cname) ->
+		name = "#{cname}="
+		ca = document.cookie.split ";"
+		for cookie in ca
+			while cookie.charAt(0) is ' '
+				return cookie = cookie.substring 1 
+			return cookie.substring(name.length,cookie.length) unless cookie.indexOf(name) is -1
+		return ""
+	createTutorialCookie: ->
+		unless @inTutorial
+			throw new Error "Not in tutorial"
+		@setCookie "oboardTutorial",@currentTutorial.tutorial_id, 0.1
+		@setCookie "oboardTutorialLastBox", @currentTutorial.boxes[@currentBoxId].order_id, 0.1
+	removeTutorialCookie: ->
+		@setCookie "oboardTutorial","",-1
+		@setCookie "oboardTutorialLastBox","",-1
 	ui:
 		initialize: (tutorials,boxesHtml,extrasHtml,menuItemHtml)->
 			@menu.initialize tutorials,menuItemHtml
@@ -69,9 +122,6 @@ window.OBoard =
 				extra = @boxRenderer.createExtra name,data
 				boxClass.extra extra
 			boxClass.render()
-			$('html, body').animate
-				scrollTop: @calculateScrollToCenter $(".oboard-box")
-			, 500
 		calculateScrollToCenter: (element) ->
 			elOffset = element.offset().top
 			elHeight = element.height()
@@ -85,17 +135,13 @@ window.OBoard =
 			offset
 
 		renderPopup: (header,text,cancel,callback) ->
-			popup = @boxRenderer.createBox "boxpopup",null,"Do you want to exit the tutorial?", null
+			popup = @boxRenderer.createBox "boxpopup",null,text, null
 			header = @boxRenderer.createExtra "header",
 				text: header
-			promptbuttons = @boxRenderer.createExtra "promptbuttons",
-				callback: (status) =>
-					if status
-						@menu.hideCloseTutorialButton()
-						@menu.showMenuButton()
-						OBoard.unloadAndEndTutorial()
-					@boxRenderer.removeBox popup
-			popup.extra promptbuttons
+			if cancel
+				promptbuttons = @boxRenderer.createExtra "promptbuttons",
+					callback: callback
+				popup.extra promptbuttons
 			popup.extra header
 			popup.render()
 			
@@ -121,6 +167,7 @@ window.OBoard =
 							OBoard.unloadAndEndTutorial()
 							@hideCloseTutorialButton()
 							@showMenuButton()
+						OBoard.ui.boxRenderer.removeBox popup
 				$(@menuWindow).bind "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", =>
 					unless @menuVisible
 						$(@menuWindow).hide()
@@ -133,6 +180,8 @@ window.OBoard =
 				@addTutorial key for key,value of tutorials
 
 				@hideCloseTutorialButton()
+				@hideMenu()
+				@hideMenuButton()
 			hideMenuButton: ->
 				$(@menuButton).addClass "oboard-menubutton-hidden"
 			showMenuButton: ->
@@ -152,11 +201,9 @@ window.OBoard =
 				element.find(".oboard-menu-item-body").text tutorial
 				element.insertBefore "#oboard-menu-close"
 				element.click =>
-					@hideMenu()
-					OBoard.loadTutorial OBoard.tutorials[tutorial], location.pathname, =>
+					OBoard.downloadTutorialData OBoard.tutorials[tutorial], (tutorial)->
+						OBoard.loadTutorial tutorial
 						OBoard.startTutorial()
-						@showCloseTutorialButton()
-						@hideMenuButton()
 			showCloseTutorialButton: ->
 				$(@closeTutorialButton).show
 					complete: =>
@@ -219,6 +266,12 @@ window.OBoard =
 							top: @data.y
 							left: @data.x
 						jbox
+
+					render: ->
+						super()
+						$('html, body').animate
+							scrollTop: OBoard.ui.calculateScrollToCenter $(".oboard-box")
+						, 500
 					unrender: ->
 						$(".oboard-box").remove()
 

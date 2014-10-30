@@ -4,6 +4,7 @@ module.exports =
 		"load-essentials": (req,user,project,callback)->
 			req.models.tutorials.find
 				project_id: project.id
+				bound_path: req.param "path"
 			, (err,tutorials) ->
 				resTutorials = []
 				for tutorial in tutorials
@@ -79,6 +80,7 @@ module.exports =
 							else
 								res =
 									name: tutorial.name
+									tutorial_id: tutorial.pub_id
 									boxes: []
 								req.models.boxes.find
 									tutorial_id: tutorial.id
