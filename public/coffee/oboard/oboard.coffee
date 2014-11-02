@@ -35,18 +35,13 @@ window.OBoard =
 			unless response is false
 				unless response.success
 					throw new Error response.data.message
-				callback response if callback?
-
+				callback response.data if callback?	
 	loadTutorial: (tutorial) ->
 		@throwErrUnlessInit()
 		@currentTutorial = tutorial
-		for i in [0..@currentTutorial.boxes.length]
-			for j in [0..@currentTutorial.boxes.length]
-				if @currentTutorial.boxes[i].order_id < @currentTutorial.boxes[j]
-					temp = @currentTutorial.boxes[i]
-					@currentTutorial.boxes[i] = @currentTutorial.boxes[j]
-					@currentTutorial.boxes[j] = temp
+		@currentTutorial.boxes = @util.bubbleSort @currentTutorial.boxes
 		@currentBoxId = -1
+
 	unloadAndEndTutorial: ->
 		@throwErrUnlessInit()
 		@ui.boxRenderer.clearBoxes()
@@ -83,35 +78,22 @@ window.OBoard =
 			throw new Error "OBoard not initialized"
 
 	getTutorialCookie: ->
-		tutorialId = @getCookie "oboardTutorial"
-		boxIndex = @getCookie "oboardTutorialLastBox"
+		tutorialId = @util.getCookie "oboardTutorial"
+		boxIndex = @util.getCookie "oboardTutorialLastBox"
 		{
 			tutorialId: if not not tutorialId then tutorialId else null
 			boxIndex: if not not boxIndex then boxIndex else null
 		} 
 
-	setCookie: (cname, cvalue, exhours) ->
-		date = new Date()
-		date.setTime date.getTime() + (exhours*60*60*1000)
-		expires = "expires="+d.toUTCString()
-		document.cookie = cname + "=" + cvalue + "; " + expires
-	
-	getCookie: (cname) ->
-		name = "#{cname}="
-		ca = document.cookie.split ";"
-		for cookie in ca
-			while cookie.charAt(0) is ' '
-				return cookie = cookie.substring 1 
-			return cookie.substring(name.length,cookie.length) unless cookie.indexOf(name) is -1
-		return ""
+
 	createTutorialCookie: ->
 		unless @inTutorial
 			throw new Error "Not in tutorial"
-		@setCookie "oboardTutorial",@currentTutorial.tutorial_id, 0.1
-		@setCookie "oboardTutorialLastBox", @currentTutorial.boxes[@currentBoxId].order_id, 0.1
+		@util.setCookie "oboardTutorial",@currentTutorial.tutorial_id, 0.1
+		@util.setCookie "oboardTutorialLastBox", @currentTutorial.boxes[@currentBoxId].order_id, 0.1
 	removeTutorialCookie: ->
-		@setCookie "oboardTutorial","",-1
-		@setCookie "oboardTutorialLastBox","",-1
+		@util.setCookie "oboardTutorial","",-1
+		@util.setCookie "oboardTutorialLastBox","",-1
 	ui:
 		initialize: (tutorials,boxesHtml,extrasHtml,menuItemHtml)->
 			@menu.initialize tutorials,menuItemHtml
@@ -122,17 +104,6 @@ window.OBoard =
 				extra = @boxRenderer.createExtra name,data
 				boxClass.extra extra
 			boxClass.render()
-		calculateScrollToCenter: (element) ->
-			elOffset = element.offset().top
-			elHeight = element.height()
-			windowHeight = $(window).height()
-			offset
-
-			if elHeight < windowHeight
-				offset = elOffset - ((windowHeight / 2) - (elHeight / 2));
-			else
-				offset = elOffset;
-			offset
 
 		renderPopup: (header,text,cancel,callback) ->
 			popup = @boxRenderer.createBox "boxpopup",null,text, null
@@ -201,8 +172,8 @@ window.OBoard =
 				element.find(".oboard-menu-item-body").text tutorial
 				element.insertBefore "#oboard-menu-close"
 				element.click =>
-					OBoard.downloadTutorialData OBoard.tutorials[tutorial], (tutorial)->
-						OBoard.loadTutorial tutorial
+					OBoard.downloadTutorialData OBoard.tutorials[tutorial], (tutorialData)->
+						OBoard.loadTutorial tutorialData
 						OBoard.startTutorial()
 			showCloseTutorialButton: ->
 				$(@closeTutorialButton).show
@@ -210,6 +181,41 @@ window.OBoard =
 						$(@closeTutorialButton).removeClass "oboard-menubutton-hidden"
 			hideCloseTutorialButton: ->
 				$(@closeTutorialButton).addClass "oboard-menubutton-hidden"
+		utils:
+			bubbleSort: (list) ->
+				for i in [0...list.length]
+					console.log i
+					for j in [0...list.length]
+						console.log j
+						if list[j].order_id > list[i].order_id
+			 				[list[j], list[i]] = [list[i], list[j]]
+				list
+			calculateScrollToCenter: (element) ->
+				elOffset = element.offset().top
+				elHeight = element.height()
+				windowHeight = $(window).height()
+				offset
+
+				if elHeight < windowHeight
+					offset = elOffset - ((windowHeight / 2) - (elHeight / 2));
+				else
+					offset = elOffset;
+				offset
+
+			setCookie: (cname, cvalue, exhours) ->
+				date = new Date()
+				date.setTime date.getTime() + (exhours*60*60*1000)
+				expires = "expires="+d.toUTCString()
+				document.cookie = cname + "=" + cvalue + "; " + expires
+			
+			getCookie: (cname) ->
+				name = "#{cname}="
+				ca = document.cookie.split ";"
+				for cookie in ca
+					while cookie.charAt(0) is ' '
+						return cookie = cookie.substring 1 
+					return cookie.substring(name.length,cookie.length) unless cookie.indexOf(name) is -1
+				return ""
 		boxRenderer:
 			boxHtml: {}
 			extrasHtml: {}
@@ -242,6 +248,7 @@ window.OBoard =
 						$element = @element()
 						@appendExtras $element
 						@appendToParent $element
+						$element
 					appendToParent: ($element)->
 						if @parent?
 							$("#"+@parent).append $element
@@ -262,15 +269,46 @@ window.OBoard =
 					element: ->
 						jbox = $(@html)
 						jbox.find(".oboard-box-body").text @text
-						jbox.offset
+						console.log jbox.find ".oboard-box"
+						$(jbox.get(0)).offset
 							top: @data.y
 							left: @data.x
 						jbox
-
 					render: ->
-						super()
+						$element = super()
+						switch @data.arrow_side
+							when 0
+								$element.find(".oboard-box-arrow-before")
+										.addClass("oboard-box-arrow-top")
+										.addClass("oboard-box-arrow-before-top")
+								$element.find(".oboard-box-arrow-after")
+										.addClass("oboard-box-arrow-top")
+										.addClass("oboard-box-arrow-after-top")
+							when 1
+								$element.find(".oboard-box-arrow-before")
+										.addClass("oboard-box-arrow-right")
+										.addClass("oboard-box-arrow-before-right")
+								$element.find(".oboard-box-arrow-after")
+										.addClass("oboard-box-arrow-right")
+										.addClass("oboard-box-arrow-after-right")
+							when 2
+								$element.find(".oboard-box-arrow-before")
+										.addClass("oboard-box-arrow-bottom")
+										.addClass("oboard-box-arrow-before-bottom")
+								$element.find(".oboard-box-arrow-after")
+										.addClass("oboard-box-arrow-bottom")
+										.addClass("oboard-box-arrow-after-bottom")
+							when 3
+								$element.find(".oboard-box-arrow-before")
+										.addClass("oboard-box-arrow-left")
+										.addClass("oboard-box-arrow-before-left")
+								$element.find(".oboard-box-arrow-after")
+										.addClass("oboard-box-arrow-left")
+										.addClass("oboard-box-arrow-after-left")
+							else
+								throw new Error "Invalid arrow side"
 						$('html, body').animate
-							scrollTop: OBoard.ui.calculateScrollToCenter $(".oboard-box")
+							scrollTop: OBoard.util.calculateScrollToCenter $(".oboard-box")
 						, 500
 					unrender: ->
 						$(".oboard-box").remove()

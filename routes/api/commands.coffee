@@ -86,7 +86,7 @@ module.exports =
 									tutorial_id: tutorial.id
 									bound_path: req.param "path"
 								, (err,boxes) ->
-									console.log tutorial.id
+									console.log tutorial.getBoxes()
 									for box in boxes
 										element = 
 											order_id: box.order_id
@@ -95,8 +95,7 @@ module.exports =
 											data:
 												x: box.x
 												y: box.y
-											next_button: box.next_button
-											arrow_side: box.arrow_side
+												arrow_side: box.arrow_side
 											type: box.type
 											extras: box.extras
 										res.boxes.push element
