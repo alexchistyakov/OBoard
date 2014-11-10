@@ -39,7 +39,11 @@
           if (xhr.readyState < 4 || xhr.status === !200) {
             return callback(false);
           } else if (xhr.readyState === 4) {
-            return callback(xhr.response);
+            if (typeof xhr.response === "string") {
+              return callback(JSON.parse(xhr.response));
+            } else {
+              return callback(xhr.response);
+            }
           } else {
             return callback(false);
           }
@@ -47,7 +51,7 @@
         xhr.withCredentials = true;
         xhr.open(action, full_url, true);
         xhr.responseType = "json";
-        if (actGETion !== "") {
+        if (action !== "GET") {
           xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         }
         return xhr.send(full_params);
@@ -65,6 +69,7 @@
       return oboardRequest({
         command: "load-essentials"
       }, "GET", function(response) {
+        var interval;
         if (response !== false) {
           response.data.assets.css.forEach(function(href) {
             var link;
@@ -80,16 +85,13 @@
             script.type = "text/javascript";
             return document.head.appendChild(script);
           });
-          return $(function() {
-            var interval;
-            return interval = setInterval(function() {
-              if (window.OBoard != null) {
-                $("body").append(response.data.content);
-                clearInterval(interval);
-                return window.OBoard.init(response.data.oboard, oboardRequest, element, oboardUrl);
-              }
-            }, 10);
-          });
+          return interval = setInterval(function() {
+            if ((window.OBoard != null) && (typeof $ !== "undefined" && $ !== null)) {
+              $("body").append(response.data.content);
+              clearInterval(interval);
+              return window.OBoard.init(response.data.oboard, oboardRequest, element, oboardUrl);
+            }
+          }, 10);
         }
       });
     };

@@ -78,25 +78,31 @@ module.exports =
 							else if err
 								callback false, err.message
 							else
-								res =
-									name: tutorial.name
-									tutorial_id: tutorial.pub_id
-									boxes: []
-								req.models.boxes.find
-									tutorial_id: tutorial.id
-									bound_path: req.param "path"
-								, (err,boxes) ->
-									console.log tutorial.getBoxes()
-									for box in boxes
-										element = 
-											order_id: box.order_id
-											text: box.text
-											bound_id: box.bound_id
-											data:
-												x: box.x
-												y: box.y
-												arrow_side: box.arrow_side
-											type: box.type
-											extras: box.extras
-										res.boxes.push element
-									callback true, res
+								req.models.boxes.findByTutorial(tutorial).count (err,count) ->
+									if err 
+										callback false, err.message
+									else
+										res =
+											name: tutorial.name
+											tutorial_id: tutorial.pub_id
+											boxes: []
+										req.models.boxes.find
+											tutorial_id: tutorial.id
+											bound_path: req.param "path"
+										, (err,boxes) ->
+											for box in boxes
+												element = 
+													order_id: box.order_id
+													text: box.text
+													bound_id: box.bound_id
+													data:
+														x: box.x
+														y: box.y
+														arrow_side: box.arrow_side
+													type: box.type
+													extras: box.extras
+												res.boxes.push element
+											res.end = (boxes.last().order_id + 1) is count
+											console.log (boxes.last().order_id + 1)
+											console.log count
+											callback true, res

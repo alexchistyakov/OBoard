@@ -15,8 +15,9 @@ window.OBoard =
 		@ui.initialize @tutorials, data.boxesHtml, data.extrasHtml, data.menuItemHtml
 		cookie = @getTutorialCookie()
 		if cookie.tutorialId? and cookie.boxIndex?
-			@downloadTutorialData cookie.tutorialId, (tutorial)->
-				if tutorial.boxes[0]? and tutorial.boxes[0].order_id is cookie.boxIndex + 1
+			console.log cookie
+			@downloadTutorialData cookie.tutorialId, (tutorial) =>
+				if tutorial.boxes[0]? and tutorial.boxes[0].order_id is parseInt(cookie.boxIndex) + 1
 					@loadTutorial tutorial
 					@startTutorial() 
 				else
@@ -33,6 +34,7 @@ window.OBoard =
 		
 		@oboardRequest params, "GET", (response) =>
 			unless response is false
+				console.log response
 				unless response.success
 					throw new Error response.data.message
 				callback response.data if callback?	
@@ -62,14 +64,16 @@ window.OBoard =
 		@throwErrUnlessInit()
 		unless @inTutorial()
 			throw new Error "No tutorial loaded"
-		@currentBoxId++
 		@ui.boxRenderer.clearBoxes()
-		if @currentTutorial.boxes[@currentBoxId]?
+		if @currentTutorial.boxes[@currentBoxId++]? and @currentBoxId < @currentTutorial.boxes.length
 			@ui.renderBox @currentTutorial.boxes[@currentBoxId]
 		else
-			@unloadAndEndTutorial()
-			@ui.menu.hideCloseTutorialButton()
-			@ui.menu.showMenuButton()
+			if @currentTutorial.end
+				@unloadAndEndTutorial()
+				@ui.menu.hideCloseTutorialButton()
+				@ui.menu.showMenuButton()
+			else
+				@createTutorialCookie()
 	inTutorial: ->
 		@currentTutorial?
 
@@ -80,17 +84,17 @@ window.OBoard =
 	getTutorialCookie: ->
 		tutorialId = @util.getCookie "oboardTutorial"
 		boxIndex = @util.getCookie "oboardTutorialLastBox"
+		console.log tutorialId
 		{
-			tutorialId: if not not tutorialId then tutorialId else null
-			boxIndex: if not not boxIndex then boxIndex else null
+			tutorialId: tutorialId or null
+			boxIndex: boxIndex or null
 		} 
-
 
 	createTutorialCookie: ->
 		unless @inTutorial
 			throw new Error "Not in tutorial"
 		@util.setCookie "oboardTutorial",@currentTutorial.tutorial_id, 0.1
-		@util.setCookie "oboardTutorialLastBox", @currentTutorial.boxes[@currentBoxId].order_id, 0.1
+		@util.setCookie "oboardTutorialLastBox", @currentTutorial.boxes[@currentBoxId-1].order_id, 0.1
 	removeTutorialCookie: ->
 		@util.setCookie "oboardTutorial","",-1
 		@util.setCookie "oboardTutorialLastBox","",-1
@@ -181,41 +185,6 @@ window.OBoard =
 						$(@closeTutorialButton).removeClass "oboard-menubutton-hidden"
 			hideCloseTutorialButton: ->
 				$(@closeTutorialButton).addClass "oboard-menubutton-hidden"
-		utils:
-			bubbleSort: (list) ->
-				for i in [0...list.length]
-					console.log i
-					for j in [0...list.length]
-						console.log j
-						if list[j].order_id > list[i].order_id
-			 				[list[j], list[i]] = [list[i], list[j]]
-				list
-			calculateScrollToCenter: (element) ->
-				elOffset = element.offset().top
-				elHeight = element.height()
-				windowHeight = $(window).height()
-				offset
-
-				if elHeight < windowHeight
-					offset = elOffset - ((windowHeight / 2) - (elHeight / 2));
-				else
-					offset = elOffset;
-				offset
-
-			setCookie: (cname, cvalue, exhours) ->
-				date = new Date()
-				date.setTime date.getTime() + (exhours*60*60*1000)
-				expires = "expires="+d.toUTCString()
-				document.cookie = cname + "=" + cvalue + "; " + expires
-			
-			getCookie: (cname) ->
-				name = "#{cname}="
-				ca = document.cookie.split ";"
-				for cookie in ca
-					while cookie.charAt(0) is ' '
-						return cookie = cookie.substring 1 
-					return cookie.substring(name.length,cookie.length) unless cookie.indexOf(name) is -1
-				return ""
 		boxRenderer:
 			boxHtml: {}
 			extrasHtml: {}
@@ -367,6 +336,41 @@ window.OBoard =
 						$(@data.triggerId).click ->
 							if OBoard.inTutorial()
 								OBoard.nextBox()
+	util:
+		bubbleSort: (list) ->
+			for i in [0...list.length]
+				console.log i
+				for j in [0...list.length]
+					console.log j
+					if list[j].order_id > list[i].order_id
+		 				[list[j], list[i]] = [list[i], list[j]]
+			list
+		calculateScrollToCenter: (element) ->
+			elOffset = element.offset().top
+			elHeight = element.height()
+			windowHeight = $(window).height()
+			offset
+
+			if elHeight < windowHeight
+				offset = elOffset - ((windowHeight / 2) - (elHeight / 2));
+			else
+				offset = elOffset;
+			offset
+
+		setCookie: (cname, cvalue, exhours) ->
+			date = new Date()
+			date.setTime date.getTime() + (exhours*60*60*1000)
+			expires = "expires="+date.toUTCString()
+			document.cookie = cname + "=" + cvalue + "; " + expires+"; path=/"
+
+		getCookie: (cname) ->
+			name = "#{cname}="
+			ca = document.cookie.split ";"
+			for cookie in ca
+				while cookie.charAt(0) is ' '
+					cookie = cookie.substring 1 
+				return cookie.substring(name.length,cookie.length) unless cookie.indexOf(name) is -1
+			return ""
 
 
 

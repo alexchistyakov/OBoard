@@ -13,7 +13,18 @@
 	text-align: center;
 	z-index: 2147483647;
 }
-
+.oboard-button-inner {
+	padding-top:1px;
+	width: auto;
+	height: auto;
+}
+@-moz-document url-prefix() {
+    .oboard-button-inner {
+		padding-top:5px;
+		width: auto;
+		height: auto;
+	}
+}
 .oboard-menubutton{
 	background-color: #10B055;
 	font-size: 35px;
@@ -43,6 +54,8 @@
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
+	-ms-transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
 	box-shadow: 0 0 10px #aaa;
 	border-radius: 3px;
 	background: #fff;
@@ -105,10 +118,11 @@
 	bottom:0;
 	margin-right: 20px;
 	font-family: "Verdana", Verdana, sans-serif;
+	-ms-transition: bottom .5s;
 	-webkit-transition: bottom .5s;
 	transition: bottom .5s;
 	background: #fff;
-	border-radius: 3 3 0 0;
+	border-radius: 3px 3px 0 0;
 	border: solid 1px #aaa;
 	z-index: 2147483647;
 }

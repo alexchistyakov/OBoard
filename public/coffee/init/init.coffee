@@ -36,7 +36,10 @@
 			if xhr.readyState < 4 or xhr.status is not 200
 				return callback false
 			else if xhr.readyState is 4
-				return callback xhr.response
+				if typeof xhr.response is "string"
+					callback JSON.parse xhr.response
+				else
+					callback xhr.response
 			else
 				return callback false
 			
@@ -45,7 +48,7 @@
 		xhr.open(action, full_url, true);
 		xhr.responseType = "json";
 
-		unless actGETion is ""
+		unless action is "GET"
 			xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
 		xhr.send(full_params);
@@ -74,11 +77,10 @@
 				script.src = src;
 				script.type = "text/javascript"
 				document.head.appendChild script
-			$ ->
-				interval = setInterval ->
-					if window.OBoard?
-						$("body").append response.data.content
-						clearInterval interval	
-						window.OBoard.init response.data.oboard,oboardRequest,element,oboardUrl
-				, 10
+			interval = setInterval ->
+				if window.OBoard? and $("body")?
+					$("body").append response.data.content
+					clearInterval interval	
+					window.OBoard.init response.data.oboard,oboardRequest,element,oboardUrl
+			, 10
 )(window,document)

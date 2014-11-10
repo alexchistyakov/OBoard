@@ -1,11 +1,11 @@
 module.exports = (req,res,next) ->
-	req.models.tutorials.create
+	###req.models.tutorials.create
 		project_id: 1
 		name: "Haiku Overview"
 		bound_path: "/Users/Alex/Documents/OBoard%20Test/Haiku%20Learning%20%20%20Portal%20%20%20Alexander.html"
 	,(err) ->
 		console.log err
-	
+	###
 	###req.models.boxes.create
 		tutorial_id: 1
 		text: "This tutorial will show you an overview of your Haiku page"
@@ -56,6 +56,21 @@ module.exports = (req,res,next) ->
 	,(err) ->
 		console.log err
 		###
+	req.models.boxes.create
+		tutorial_id: 1
+		text: "Just a random test box"
+		order_id: 3
+		type: "boxpopup"
+		bound_id: null
+		x: 0
+		y: 0
+		arrow_side: 0
+		bound_path: "/Users/Alex/Documents/OBoard%20Test/foundation.html"
+		extras:
+			okbutton:
+				{}
+	,(err) ->
+		console.log err
 	###req.models.projects.create
 		owner_id: 1
 		name: "Localhost"
