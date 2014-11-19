@@ -10,6 +10,7 @@ module.exports.express = orm.express config.database,
 		models.boxes = require("./tutorials/boxes")(db,models)
 		models.users = require("./users")(db,models)
 		models.projects = require("./projects")(db,models)
+		models.menus = require("./menus")(db,models)
 
 		models.boxes.hasOne "tutorial",models.tutorials, 
 			reverse : "boxes"
@@ -20,6 +21,9 @@ module.exports.express = orm.express config.database,
 		models.tutorials.hasOne "project",models.projects,
 			reverse: "tutorials"
 		
+		models.menus.hasOne "project",models.projects,
+			reverse: "menu"
+
 		unless init
 			async.series [
 				(next) =>

@@ -12,7 +12,7 @@ window.OBoard =
 		@oboardUrl = url
 		for tutorial in data.tutorials
 			@tutorials[tutorial.name] = tutorial.tutorial_id
-		@ui.initialize @tutorials, data.boxesHtml, data.extrasHtml, data.menuItemHtml
+		@ui.initialize @tutorials, data.boxesHtml, data.extrasHtml, data.menuItemHtml, data.menuData
 		cookie = @getTutorialCookie()
 		if cookie.tutorialId? and cookie.boxIndex?
 			console.log cookie
@@ -49,11 +49,11 @@ window.OBoard =
 		@ui.boxRenderer.clearBoxes()
 		@currentTutorial = null
 		@currentBoxId = null
-
+	closeTutorial: ->
+		@throwErrUnlessInit()
 	startTutorial: ->
 		@throwErrUnlessInit()
-		unless @inTutorial()
-			throw new Error "Not in tutorial"
+		
 		@currentBoxId = 0;
 		@ui.menu.hideMenu()
 		@ui.menu.showCloseTutorialButton()
@@ -62,8 +62,7 @@ window.OBoard =
 
 	nextBox: ->
 		@throwErrUnlessInit()
-		unless @inTutorial()
-			throw new Error "No tutorial loaded"
+		@throwErrUnlessInTutorial()
 		@ui.boxRenderer.clearBoxes()
 		if @currentTutorial.boxes[@currentBoxId++]? and @currentBoxId < @currentTutorial.boxes.length
 			@ui.renderBox @currentTutorial.boxes[@currentBoxId]
@@ -74,13 +73,29 @@ window.OBoard =
 				@ui.menu.showMenuButton()
 			else
 				@createTutorialCookie()
+	previousBox: ->
+		@throwErrUnlessInit()
+		@throwErrUnlessInTutorial()
+		@ui.boxRenderer.clearBoxes()
+		unless @currentBoxId <= 0
+			@ui.renderBox @currentTutorial.boxes[@currentBoxId--]
+	goToBox: (index) ->
+		@throwErrUnlessInit()
+		@throwErrUnlessInTutorial()
+		@ui.boxRenderer.clearBoxes()
+		if @currentTutorial.boxes[index]?
+			@ui.renderBox @currentTutorial.boxes[index]
+		else
+			throw new Error "No such box"
 	inTutorial: ->
 		@currentTutorial?
 
 	throwErrUnlessInit: ->
 		unless @initialized
 			throw new Error "OBoard not initialized"
-
+	throwErrUnlessInTutorial: ->
+		unless @inTutorial()
+			throw new Error "Not in tutorial"
 	getTutorialCookie: ->
 		tutorialId = @util.getCookie "oboardTutorial"
 		boxIndex = @util.getCookie "oboardTutorialLastBox"
@@ -94,13 +109,35 @@ window.OBoard =
 		unless @inTutorial
 			throw new Error "Not in tutorial"
 		@util.setCookie "oboardTutorial",@currentTutorial.tutorial_id, 0.1
-		@util.setCookie "oboardTutorialLastBox", @currentTutorial.boxes[@currentBoxId-1].order_id, 0.1
+		@util.setCookie "oboardTutorialLastBox", @currentTutorial.boxes[@currentBoxId - 1].order_id, 0.1
 	removeTutorialCookie: ->
 		@util.setCookie "oboardTutorial","",-1
 		@util.setCookie "oboardTutorialLastBox","",-1
+	hooks:
+		hooksBefore: {}
+		hooksAfter: {}
+		createHookBefore: (tutorialId,boxIndex,hook) ->
+			hooksBefore.push
+				tutorial: tutorialId
+				box: boxIndex
+				hook: hook
+		createHookAfter: (tutorialId,boxIndex,hook) ->
+			hooksAfter.push
+				tutorial: tutorialId
+				box: boxIndex
+				hook: hook
+		callHookBefore: (box) ->
+			for hookObject in @hooksBefore
+				if hookObject.tutorial is OBoard.currentTutorial and hookObject.box is OBoard.currentBoxId
+					hookObject.hook box	
+		callHookAfter: ->
+			for hookObject in @hooksAfter
+				if hookObject.tutorial is OBoard.currentTutorial and hookObject.box is OBoard.currentBoxId
+					hookObject.hook()
+
 	ui:
-		initialize: (tutorials,boxesHtml,extrasHtml,menuItemHtml)->
-			@menu.initialize tutorials,menuItemHtml
+		initialize: (tutorials,boxesHtml,extrasHtml,menuItemHtml, menuData)->
+			@menu.initialize tutorials,menuItemHtml, menuData
 			@boxRenderer.initialize boxesHtml,extrasHtml
 		renderBox: (box) ->
 			boxClass = @boxRenderer.createBox box.type,box.bound_id,box.text,box.data
@@ -128,9 +165,11 @@ window.OBoard =
 			menuWindow: "#oboard-menu"
 			closeTutorialButton: "#oboard-close-tutorial-button"
 			menuVisible: true
-			initialize: (tutorials,menuItemHtml) ->
+			initialize: (tutorials,menuItemHtml,data) ->
 				@menuItemHtml = menuItemHtml
-				$(@menuButton).click =>
+				@buildGraphics data
+
+				$("#oboard-menubutton-outer").click =>
 					@showMenu()
 					@hideMenuButton()
 				$("#oboard-menu-close").click =>
@@ -146,9 +185,9 @@ window.OBoard =
 				$(@menuWindow).bind "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", =>
 					unless @menuVisible
 						$(@menuWindow).hide()
-				$(@menuButton).bind "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", =>
+				$("#oboard-menubutton-outer").bind "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", =>
 					if @menuVisible
-						$(@menuButton).hide()
+						$("#oboard-menubutton-outer").hide()
 				$(@closeTutorialButton).bind "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", =>
 					unless OBoard.inTutorial()
 						$(@closeTutorialButton).hide()
@@ -157,12 +196,22 @@ window.OBoard =
 				@hideCloseTutorialButton()
 				@hideMenu()
 				@hideMenuButton()
+			buildGraphics: (data) ->
+				$(@menuButton).css "background-color", data.buttonColor
+				if data.buttonHeader?
+					$(".oboard-menubutton-header").text data.buttonHeader
+				else
+					$(".oboard-menubutton-header").remove()
+					$(@menuButton).removeClass "oboard-menubutton-w-header"
+					$(@menuButton).addClass "oboard-menubutton"
+				$(".oboard-menu-header").text data.menuHeader
+				$("#oboard-menu-header, #oboard-menu-close").css "background-color", data.detailsBackground
 			hideMenuButton: ->
-				$(@menuButton).addClass "oboard-menubutton-hidden"
+				$(".oboard-menubutton-outer").addClass "oboard-menubutton-hidden"
 			showMenuButton: ->
-				$(@menuButton).show 
+				$(".oboard-menubutton-outer").show 
 					complete: =>
-						$(@menuButton).removeClass "oboard-menubutton-hidden"
+						$(".oboard-menubutton-outer").removeClass "oboard-menubutton-hidden"
 			showMenu: ->
 				$(@menuWindow).show
 					complete: =>
@@ -213,10 +262,12 @@ window.OBoard =
 						@html = OBoard.ui.boxRenderer.boxHtml[type]
 						@extras = []
 					render: ->
+						OBoard.hooks.callHookBefore @
 						OBoard.ui.boxRenderer.activeBoxes.push @
 						$element = @element()
 						@appendExtras $element
 						@appendToParent $element
+						OBoard.hooks.callHookAfter()
 						$element
 					appendToParent: ($element)->
 						if @parent?
@@ -371,6 +422,3 @@ window.OBoard =
 					cookie = cookie.substring 1 
 				return cookie.substring(name.length,cookie.length) unless cookie.indexOf(name) is -1
 			return ""
-
-
-

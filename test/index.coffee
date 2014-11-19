@@ -56,7 +56,7 @@ module.exports = (req,res,next) ->
 	,(err) ->
 		console.log err
 		###
-	req.models.boxes.create
+	###req.models.boxes.create
 		tutorial_id: 1
 		text: "Just a random test box"
 		order_id: 3
@@ -69,6 +69,13 @@ module.exports = (req,res,next) ->
 		extras:
 			okbutton:
 				{}
+	,(err) ->
+		console.log err###
+	req.models.menus.create
+		project_id: 1
+		button_color: "#f00"
+		button_header: "Help"
+		menu_header: "Need Help?"
 	,(err) ->
 		console.log err
 	###req.models.projects.create

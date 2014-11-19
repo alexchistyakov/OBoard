@@ -1,12 +1,11 @@
-.oboard-menubutton, .oboard-close-tutorial-button{
-	width: 40px;
-	height: 40px;
+.oboard-close-tutorial-button, .oboard-menubutton-outer .oboard-menubutton-w-header{
 	color: #fff;
 	right:0;
 	bottom:0;
 	margin-right: 20px;
 	position: fixed;
 	border-radius: 10px 10px 0 0;
+	height: 40px;
 	-webkit-transition: bottom .5s;
 	transition: bottom .5s;
 	cursor: pointer;
@@ -15,9 +14,10 @@
 }
 .oboard-button-inner {
 	padding-top:1px;
-	width: auto;
+	width: 40px;
 	height: auto;
 }
+
 @-moz-document url-prefix() {
     .oboard-button-inner {
 		padding-top:5px;
@@ -25,9 +25,39 @@
 		height: auto;
 	}
 }
-.oboard-menubutton{
-	background-color: #10B055;
+.oboard-menubutton-outer{
+	height: 40px;
+	position: fixed;
+	right:0;
+	bottom:0;
+	width: auto;
+	-webkit-transition: bottom .5s;
+	transition: bottom .5s;
+	margin-right: 20px;
+	transform: translate(-100%, 0);
+	cursor: pointer;
+	z-index: 2147483647;
+}
+.oboard-menubutton-outer .oboard-menubutton,.oboard-menubutton-outer .oboard-menubutton-w-header{
+	color: #fff;
+	text-align: center;
 	font-size: 35px;
+	background-color: #10B055;
+}
+.oboard-menubutton-outer .oboard-menubutton-w-header{
+	border-radius: 10px 0 0 0;
+	margin-right: 0;
+}
+.oboard-menubutton-outer .oboard-menubutton{
+	border-radius: 10px 10px 0 0;
+}
+.oboard-menubutton-outer .oboard-menubutton-header{
+	background: #fff;
+	color: #ccc;
+	font-size: 30px;
+	width: auto;
+	height: 40px;
+	position: absolute;
 }
 .oboard-close-tutorial-button{
 	background-color: #C70202;
